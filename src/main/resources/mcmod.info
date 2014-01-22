@@ -1,0 +1,16 @@
+[
+{
+  "modid": "thebombzenapi",
+  "name": "ThebombzenAPI",
+  "description": "ThebombzenAPI provides common code between Thebombzen's Mods.",
+  "version": "2.3.0",
+  "mcversion": "1.7.2",
+  "url": "http://is.gd/Yqfydo",
+  "updateUrl": "",
+  "authors": ["Thebombzen"],
+  "credits": "Thebombzen",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
