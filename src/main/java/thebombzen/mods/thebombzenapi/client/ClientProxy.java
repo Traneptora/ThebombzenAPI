@@ -9,8 +9,15 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
+	
 	@Override
 	public File getMinecraftFolder() {
 		return Minecraft.getMinecraft().mcDataDir;
 	}
+	
+	@Override
+	public boolean isClientProxy(){
+		return true;
+	}
+	
 }

@@ -5,10 +5,24 @@ import java.io.File;
 import net.minecraft.server.MinecraftServer;
 
 public class CommonProxy {
+	
+	/**
+	 * Get the base minecraft folder.
+	 * @return
+	 */
 	public File getMinecraftFolder() {
-		return (File) ThebombzenAPI.callPrivateMethod(
-				MinecraftServer.getServer(), MinecraftServer.class,
-				new String[] { "getDataDirectory", "func_71238_n", "n" },
-				new Class<?>[0]);
+		return new File(MinecraftServer.getServer().getFolderName());
 	}
+	
+	/**
+	 * Returns whether this is the client proxy.
+	 * This is useful because (this instanceof ClientProxy) crashes the server with
+	 * ClassNotFoundException caused by NoClassDefFoundError
+	 * 
+	 * @return true if (this instanceof ClientProxy), false otherwise
+	 */
+	public boolean isClientProxy() {
+		return false;
+	}
+	
 }
