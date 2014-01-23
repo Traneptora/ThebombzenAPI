@@ -5,76 +5,105 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatMessageComponent;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.ChatComponentText;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
-import thebombzen.mods.thebombzenapi.client.ClientProxy;
-import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigOpenScreen;
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.ModAPIManager;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "ThebombzenAPI", name = "ThebombzenAPI", version = "2.2.0")
-public class ThebombzenAPI implements ITickHandler {
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.0")
+public class ThebombzenAPI {
 
+	/**
+	 * Platform dependent newline. Microsoft thinks it's so cool with its
+	 * carriage returns. It's not. Real operating systems don't use carriage
+	 * returns before every line feed. (Except when returning a carriage.)
+	 */
+	public static final String newLine = String.format("%n");
+
+	/**
+	 * The mod instance, if you couldn't figure that out yourself.
+	 */
 	@Instance(value = "ThebombzenAPI")
 	public static ThebombzenAPI instance;
 
+	/**
+	 * Various side-dependent routines
+	 */
 	@SidedProxy(clientSide = "thebombzen.mods.thebombzenapi.client.ClientProxy", serverSide = "thebombzen.mods.thebombzenapi.CommonProxy")
 	public static CommonProxy proxy;
 
-	@SideOnly(Side.CLIENT)
-	private static Map<ThebombzenAPIBaseMod, boolean[]> keysDown;
+	/**
+	 * The set of ThebombzenAPIBaseMod. Note that each mod must individually
+	 * register itself because it's easier for me than that fancy classpath
+	 * probing schtuff.
+	 */
+	private static Set<ThebombzenAPIBaseMod> mods = new HashSet<ThebombzenAPIBaseMod>();
 
-	private static List<ThebombzenAPIBaseMod> mods = new ArrayList<ThebombzenAPIBaseMod>();
-	public static final String newLine = String.format("%n");
+	/**
+	 * This is the {System.identityHashCode} of the previous client-side world,
+	 * used to detect when a new world has opened. By storing the
+	 * {System.identityHashCode} rather than the {net.minecraft.world.World} we
+	 * don't have to worry about garbage collection issues, but we can still
+	 * detect a world change.
+	 */
+	@SideOnly(Side.CLIENT)
 	public static int prevWorld = 0;
 
+	/**
+	 * Keycodes used for ThebombzenAPI (should be empty after forge config
+	 * windows in mc1.7.2).
+	 */
 	@SideOnly(Side.CLIENT)
 	private static int[] thebombzenAPIKeyCodes;
 
-	@SideOnly(Side.CLIENT)
-	private static boolean[] thebombzenAPIKeysDown;
-
-	@SideOnly(Side.CLIENT)
-	private static Map<ThebombzenAPIBaseMod, boolean[]> togglesDown;
-
-	public static boolean areItemStackListsEqual(List<ItemStack> list1,
-			List<ItemStack> list2) {
-		if (list1.size() != list2.size()) {
+	/**
+	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
+	 * the same items. It depends on multiplicity, but doesn't depend on order.
+	 * Note that it will return false if comparing 2 Dirt + 2 Dirt to 1 Dirt + 3
+	 * Dirt.
+	 * 
+	 * @param coll1
+	 *            The first collection
+	 * @param coll2
+	 *            The first collection
+	 * @return true if they contain the same items (multiplicity matters, order
+	 *         doesn't), false otherwise
+	 */
+	public static boolean areItemStackCollectionsEqual(
+			Collection<? extends ItemStack> coll1,
+			Collection<? extends ItemStack> coll2) {
+		if (coll1.size() != coll2.size()) {
 			return false;
 		}
 
-		List<ItemStack> list1C = new ArrayList<ItemStack>(list1);
-		List<ItemStack> list2C = new ArrayList<ItemStack>(list2);
+		List<ItemStack> list1 = new ArrayList<>(coll1);
+		List<ItemStack> list2 = new ArrayList<>(coll2);
 
-		Iterator<ItemStack> iter1 = list1C.iterator();
+		Iterator<ItemStack> iter1 = list1.iterator();
 
 		outer: while (iter1.hasNext()) {
 			ItemStack stack1 = iter1.next();
-			Iterator<ItemStack> iter2 = list2C.iterator();
+			Iterator<ItemStack> iter2 = list2.iterator();
 			while (iter2.hasNext()) {
 				ItemStack stack2 = iter2.next();
 				if (ItemStack.areItemStacksEqual(stack1, stack2)) {
@@ -88,62 +117,56 @@ public class ThebombzenAPI implements ITickHandler {
 		return true;
 	}
 
-	public static List<Integer> asList(int[] toList) {
-		List<Integer> ret = new ArrayList<Integer>();
-		for (int i : toList) {
-			ret.add(i);
-		}
-		return ret;
-	}
-
-	public static Object callPrivateMethod(Object arg, Class<?> clazz,
-			String name, Class<?>[] parameterTypes, Object... args) {
-		String[] names = { name };
-		return callPrivateMethod(arg, clazz, names, parameterTypes, args);
-	}
-
-	public static Object callPrivateMethod(Object arg, Class<?> clazz,
-			String[] names, Class<?>[] parameterTypes, Object... args) {
-		for (String name : names) {
-			try {
-				Method method = clazz.getDeclaredMethod(name, parameterTypes);
-				method.setAccessible(true);
-				try {
-					return method.invoke(arg, args);
-				} catch (Exception e) {
-					return null;
-				}
-			} catch (NoSuchMethodException nsme) {
-				continue;
-			}
-		}
-		return null;
-	}
-
-	public static int ceil_float(float f) {
-		return -MathHelper.floor_float(-f);
-	}
-
-	public static int ceilDouble(double d) {
-		return -MathHelper.floor_double(-d);
-	}
-
+	/**
+	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
+	 * itself, because they're all FML mods anyway.
+	 * 
+	 * @return the list of registered {ThebombzenAPIBaseMod}.
+	 */
 	public static ThebombzenAPIBaseMod[] getMods() {
 		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
 	}
 
-	public static Object getPrivateField(Object arg, Class<?> clazz, String name) {
+	/**
+	 * Get the value of a private field.
+	 * 
+	 * @param arg
+	 *            The object whose field we're retrieving.
+	 * @param clazz
+	 *            The declaring class of the private field. Use a class literal
+	 *            and not getClass(). This might be a superclass of the class of
+	 *            the object.
+	 * @param name
+	 *            The field name.
+	 * @return The value of the field.
+	 */
+	public static <T> T getPrivateField(Object arg, Class<?> clazz, String name) {
 		return getPrivateField(arg, clazz, new String[] { name });
 	}
 
-	public static Object getPrivateField(Object arg, Class<?> clazz,
+	/**
+	 * Get the value of a private field. This one allows you to pass multiple
+	 * field names (useful for obfuscation).
+	 * 
+	 * @param arg
+	 *            The object whose field we're retrieving.
+	 * @param clazz
+	 *            The declaring class of the private field. Use a class literal
+	 *            and not getClass(). This might be a superclass of the class of
+	 *            the object.
+	 * @param name
+	 *            The multiple field names of the field to retrieve.
+	 * @return The value of the field.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getPrivateField(Object arg, Class<?> clazz,
 			String[] names) {
 		for (String name : names) {
 			try {
 				Field field = clazz.getDeclaredField(name);
 				field.setAccessible(true);
 				try {
-					return field.get(arg);
+					return (T) field.get(arg);
 				} catch (Exception e) {
 					return null;
 				}
@@ -154,47 +177,127 @@ public class ThebombzenAPI implements ITickHandler {
 		return null;
 	}
 
-	@SideOnly(Side.CLIENT)
-	private static void handleKeyBindings() {
-		for (ThebombzenAPIBaseMod mod : mods) {
-			for (int i = 0; i < mod.getNumToggleKeys(); i++) {
-				int keyCode = mod.getToggleKeyCode(i);
-				boolean state = (keyCode < 0 ? Mouse
-						.isButtonDown(keyCode + 100) : Keyboard
-						.isKeyDown(keyCode));
-				if (state && !togglesDown.get(mod)[i]) {
-					mod.setToggleEnabled(i, !mod.isToggleEnabled(i), true);
-					mod.writeToCorrectMemoryFile();
-				}
-				togglesDown.get(mod)[i] = state;
-			}
-			for (int i = 0; i < mod.getNumActiveKeys(); i++) {
-				int keyCode = mod.getActiveKeyCode(i);
-				boolean state = (keyCode < 0 ? Mouse
-						.isButtonDown(keyCode + 100) : Keyboard
-						.isKeyDown(keyCode));
-				if (state && !keysDown.get(mod)[i]) {
-					mod.activeKeyPressed(keyCode);
-				}
-				keysDown.get(mod)[i] = state;
-			}
-		}
-		for (int i = 0; i < thebombzenAPIKeyCodes.length; i++) {
-			int keyCode = thebombzenAPIKeyCodes[i];
-			boolean state = (keyCode < 0 ? Mouse.isButtonDown(keyCode + 100)
-					: Keyboard.isKeyDown(keyCode));
-			if (state && !thebombzenAPIKeysDown[i]) {
-				if (i == 0) { // open thebombzenapiguioptions
-					if (Keyboard.isKeyDown(42)) {
-						Minecraft.getMinecraft().displayGuiScreen(
-								new ThebombzenAPIConfigOpenScreen());
-					}
-				}
-			}
-			thebombzenAPIKeysDown[i] = state;
-		}
+	/**
+	 * Turn a {java.util.Collection} of {Integer}s into an array of {int}.
+	 * {java.util.Collection.toArray()} doesn't let you do this.
+	 * 
+	 * @param coll
+	 *            The {java.util.Collection} to convert.
+	 * @return An array of {int}.
+	 */
+	public static int[] intArrayFromIntegerCollection(
+			Collection<? extends Integer> coll) {
+		List<Integer> ret = new ArrayList<>();
+		ret.addAll(coll);
+		return intArrayFromIntegerList(ret);
 	}
 
+	/**
+	 * Turn a {java.util.List} of {Integer}s into an array of {int}.
+	 * {java.util.List.toArray()} doesn't let you do this.
+	 * 
+	 * @param list
+	 *            The {java.util.List} to convert.
+	 * @return An array of {int}.
+	 */
+	public static int[] intArrayFromIntegerList(List<? extends Integer> list) {
+		int[] ret = new int[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			ret[i] = list.get(i);
+		}
+		return ret;
+	}
+
+	/**
+	 * Correctly converts an {int[]} to {java.util.List<Integer>}, because
+	 * {java.util.Arrays.asList()} converts it to a {java.util.List<int[]>} with
+	 * one element.
+	 * 
+	 * @param Array
+	 *            of {int}
+	 * @return {java.util.List} of {Integer}
+	 */
+	public static List<Integer> intArrayToIntegerList(int[] array) {
+		List<Integer> ret = new ArrayList<>(array.length);
+		for (int i : array) {
+			ret.add(i);
+		}
+		return ret;
+	}
+
+	/**
+	 * Invokes a private method, arranged conveniently. Tip: Use class literals.
+	 * 
+	 * @param arg
+	 *            This is the object whose method we're invoking.
+	 * @param clazz
+	 *            This is the declaring class of the method we want. Use a class
+	 *            literal and not getClass(). This argument is necessary because
+	 *            {Class.getMethods()} only returns public methods, and
+	 *            {Class.getDeclaredMethods()} requires the declaring class.
+	 * @param name
+	 *            The name of the method we want to invoke
+	 * @param parameterTypes
+	 *            The types of the parameters of the method (because
+	 *            overloading).
+	 * @param args
+	 *            The arguments we want to pass to the method.
+	 * @return Whatever the method returns.
+	 */
+	public static <T> T invokePrivateMethod(Object arg, Class<?> clazz,
+			String name, Class<?>[] parameterTypes, Object... args) {
+		return invokePrivateMethod(arg, clazz, new String[] { name },
+				parameterTypes, args);
+	}
+
+	/**
+	 * Invokes a private method, arranged conveniently. This one allows you to
+	 * pass multiple possible method names, useful for bbfuscation.
+	 * 
+	 * @param arg
+	 *            This is the object whose method we're invoking.
+	 * @param clazz
+	 *            This is the declaring class of the method we want. Use a class
+	 *            literal and not getClass(). This argument is necessary because
+	 *            {Class.getMethods()} only returns public methods, and
+	 *            {Class.getDeclaredMethods()} requires the declaring class.
+	 * @param names
+	 *            The multiple possible method names of the method we want to
+	 *            invoke
+	 * @param parameterTypes
+	 *            The types of the parameters of the method (because
+	 *            overloading).
+	 * @param args
+	 *            The arguments we want to pass to the method.
+	 * @return Whatever the method returns.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T invokePrivateMethod(Object arg, Class<?> clazz,
+			String[] names, Class<?>[] parameterTypes, Object... args) {
+		for (String name : names) {
+			try {
+				Method method = clazz.getDeclaredMethod(name, parameterTypes);
+				method.setAccessible(true);
+				try {
+					return (T) method.invoke(arg, args);
+				} catch (Exception e) {
+					return null;
+				}
+			} catch (NoSuchMethodException nsme) {
+				continue;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Determines whether a method name is currently being executed. (That is,
+	 * on the method stack.) This is useful for debugging and not much else.
+	 * 
+	 * @param methodName
+	 * @return true if methodName is on the method stack, false otherwise.
+	 */
+	@SideOnly(Side.CLIENT)
 	public static boolean isCurrentlyExecutingMethod(String methodName) {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (StackTraceElement element : trace) {
@@ -205,23 +308,52 @@ public class ThebombzenAPI implements ITickHandler {
 		return false;
 	}
 
+	/**
+	 * Registers the ThebombzenAPIBaseMod for use with ThebombzenAPI Things will
+	 * probably not work if you don't register the mod. Note that your mod still
+	 * needs to be an FML mod. This won't load it for you.
+	 * 
+	 * @param mod
+	 *            The mod to register
+	 */
 	public static void registerMod(ThebombzenAPIBaseMod mod) {
-		if (!mods.contains(mod)) {
-			mods.add(mod);
-		} else {
-			return;
-		}
-		if (!CommonProxy.class.equals(proxy.getClass())){
-			boolean[] keysDownArray = new boolean[mod.getNumToggleKeys()];
-			togglesDown.put(mod, keysDownArray);
-		}
+		mods.add(mod);
 	}
 
+	/**
+	 * Set the value of a private field.
+	 * 
+	 * @param arg
+	 *            The object whose field we're setting.
+	 * @param clazz
+	 *            The declaring class of the private field. Use a class literal
+	 *            and not getClass(). This might be a superclass of the class of
+	 *            the object.
+	 * @param name
+	 *            The field name.
+	 * @param set
+	 *            The value we're assigning to the field.
+	 */
 	public static void setPrivateField(Object arg, Class<?> clazz, String name,
 			Object set) {
 		setPrivateField(arg, clazz, new String[] { name }, set);
 	}
 
+	/**
+	 * Set the value of a private field. This one allows you to pass multiple
+	 * field names (useful for obfuscation).
+	 * 
+	 * @param arg
+	 *            The object whose field we're setting.
+	 * @param clazz
+	 *            The declaring class of the private field. Use a class literal
+	 *            and not getClass(). This might be a superclass of the class of
+	 *            the object.
+	 * @param name
+	 *            The field name.
+	 * @param set
+	 *            The value we're assigning to the field.
+	 */
 	public static void setPrivateField(Object arg, Class<?> clazz,
 			String[] names, Object set) {
 		for (String name : names) {
@@ -239,22 +371,19 @@ public class ThebombzenAPI implements ITickHandler {
 		}
 	}
 
-	public static int[] toArray(Collection<? extends Integer> list) {
-		List<Integer> ret = new ArrayList<Integer>();
-		ret.addAll(list);
-		return toArray(ret);
-	}
-
-	public static int[] toArray(List<? extends Integer> list) {
-		int[] ret = new int[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			ret[i] = list.get(i);
-		}
-		return ret;
-	}
-
+	/**
+	 * Main client tick loop.
+	 * 
+	 * @param tickEvent
+	 *            the ClientTickEvent that forge passes.
+	 */
 	@SideOnly(Side.CLIENT)
-	public void clientTick() {
+	@SubscribeEvent
+	public void clientTick(ClientTickEvent tickEvent) {
+
+		if (tickEvent.phase.equals(Phase.END)) {
+			return;
+		}
 
 		Minecraft mc = Minecraft.getMinecraft();
 
@@ -268,8 +397,8 @@ public class ThebombzenAPI implements ITickHandler {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				String latestVersion = mod.getLatestVersion();
 				if (!latestVersion.equals(mod.getLongVersionString())) {
-					mc.thePlayer.sendChatToPlayer(ChatMessageComponent
-							.createFromText(latestVersion + " is available."));
+					mc.thePlayer.func_146105_b(new ChatComponentText(
+							latestVersion + " is available."));
 				}
 			}
 		}
@@ -278,10 +407,6 @@ public class ThebombzenAPI implements ITickHandler {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				mod.readFromCorrectMemoryFile();
 			}
-		}
-
-		if (mc.currentScreen == null) {
-			handleKeyBindings();
 		}
 
 		for (ThebombzenAPIBaseMod mod : mods) {
@@ -295,48 +420,37 @@ public class ThebombzenAPI implements ITickHandler {
 		prevWorld = currWorld;
 	}
 
-	@Override
-	public String getLabel() {
-		return "thebombzen.mods.thebombzenapi.ThebombzenAPI";
-	}
-
+	/**
+	 * FML load method. Does load stuff.
+	 * 
+	 * @param event
+	 */
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-		if (event.getSide().equals(Side.CLIENT)) {
-			TickRegistry.registerTickHandler(this, Side.CLIENT);
-		}
+
 	}
 
+	/**
+	 * FML postInit method. Does postInit stuff.
+	 * 
+	 * @param event
+	 */
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 
 	}
 
+	/**
+	 * FML preInitMethod. Does preInit stuff.
+	 * 
+	 * @param event
+	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		FMLCommonHandler.instance().bus().register(this);
 		if (event.getSide().equals(Side.CLIENT)) {
-			keysDown = new HashMap<ThebombzenAPIBaseMod, boolean[]>();
 			thebombzenAPIKeyCodes = new int[] { Keyboard.KEY_B };
-			thebombzenAPIKeysDown = new boolean[] { false };
-			togglesDown = new HashMap<ThebombzenAPIBaseMod, boolean[]>();
 		}
-	}
-
-	@Override
-	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-		if (type.contains(TickType.CLIENT)) {
-			clientTick();
-		}
-	}
-
-	@Override
-	public EnumSet<TickType> ticks() {
-		return EnumSet.of(TickType.CLIENT);
-	}
-
-	@Override
-	public void tickStart(EnumSet<TickType> type, Object... tickData) {
-
 	}
 
 }
