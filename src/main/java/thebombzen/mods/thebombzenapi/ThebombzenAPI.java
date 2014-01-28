@@ -45,7 +45,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public static final String newLine = String.format("%n");
 
 	/**
-	 * The mod instance, if you couldn't figure that out yourself.
+	 * The mod instance
 	 */
 	@Instance(value = "thebombzenapi")
 	public static ThebombzenAPI instance;
@@ -53,8 +53,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Various side-dependent routines
 	 */
-	@SidedProxy(clientSide = "thebombzen.mods.thebombzenapi.client.ClientProxy", serverSide = "thebombzen.mods.thebombzenapi.CommonProxy")
-	public static CommonProxy proxy;
+	@SidedProxy(clientSide = "thebombzen.mods.thebombzenapi.client.ClientSideSpecificUtilities", serverSide = "thebombzen.mods.thebombzenapi.server.ServerSideSpecificUtilities")
+	public static SideSpecificUtlities sideSpecificUtilities;
 
 	/**
 	 * The set of ThebombzenAPIBaseMod. Note that each mod must individually

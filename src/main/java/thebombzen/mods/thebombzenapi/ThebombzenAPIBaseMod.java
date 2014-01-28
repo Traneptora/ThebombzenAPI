@@ -95,7 +95,7 @@ public abstract class ThebombzenAPIBaseMod {
 	 * It should only be called independently by ThebombzenAPI itself.
 	 */
 	void initialize(){
-		if (ThebombzenAPI.proxy.isClientProxy()) {
+		if (ThebombzenAPI.sideSpecificUtilities.isClient()) {
 			toggleKeyCodes = new int[getNumToggleKeys()];
 			toggles = new boolean[getNumToggleKeys()];
 			defaultToggles = new boolean[getNumToggleKeys()];
@@ -103,7 +103,7 @@ public abstract class ThebombzenAPIBaseMod {
 
 		ThebombzenAPI.registerMod(this);
 
-		File mineFile = ThebombzenAPI.proxy.getMinecraftDirectory();
+		File mineFile = ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory();
 		File modsFolder = new File(mineFile, "mods");
 		modFolder = new File(modsFolder, getLongName());
 		modFolder.mkdirs();

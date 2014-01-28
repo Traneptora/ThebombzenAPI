@@ -64,7 +64,7 @@ public abstract class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenA
 		mod = baseMod;
 		this.optionClass = optionClass;
 		propsFile = new File(new File(
-				ThebombzenAPI.proxy.getMinecraftDirectory(), "config"), mod
+				ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory(), "config"), mod
 				.getClass().getSimpleName() + ".cfg");
 	}
 

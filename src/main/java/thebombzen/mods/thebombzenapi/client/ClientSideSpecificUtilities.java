@@ -3,7 +3,7 @@ package thebombzen.mods.thebombzenapi.client;
 import java.io.File;
 
 import net.minecraft.client.Minecraft;
-import thebombzen.mods.thebombzenapi.CommonProxy;
+import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -13,18 +13,15 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author thebombzen
  */
 @SideOnly(Side.CLIENT)
-public class ClientProxy extends CommonProxy {
+public class ClientSideSpecificUtilities implements SideSpecificUtlities {
 
-	/**
-	 * Returns your .minecraft directory.
-	 */
 	@Override
 	public File getMinecraftDirectory() {
 		return Minecraft.getMinecraft().mcDataDir;
 	}
 
 	@Override
-	public boolean isClientProxy() {
+	public boolean isClient() {
 		return true;
 	}
 
