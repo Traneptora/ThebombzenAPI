@@ -26,10 +26,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * This class is the superclass of Thebombzen's mods. Extend this to get
- * ThebombzenAPI functionality. I'm using inheritance rather than annotations
- * because annotation stuff is hard :-(. Actually, it's because it's practical,
- * because Forge doesn't require inheritance.
+ * ThebombzenAPI functionality. I'm using inheritance because it's practical,
+ * because FML doesn't require inheritance.
  * 
+ * You still need a Mod annotation on your mod. This will not load your mod for you.
  * @author thebombzen
  */
 public abstract class ThebombzenAPIBaseMod {
@@ -78,6 +78,51 @@ public abstract class ThebombzenAPIBaseMod {
 	 */
 	protected File debugFile;
 
+	/**
+	 * This is the standard constructor. By using a constructor routine
+	 * rather than preInit/load/postInit we don't need method stubs in the classes
+	 * that extend this one.
+	 */
+	public ThebombzenAPIBaseMod(){
+		if (!ThebombzenAPI.class.isAssignableFrom(getClass())){
+			initialize();
+		}
+	}
+	
+	/**
+	 * This is the init routine. It is separate from the constructor because
+	 * it crashes if this mod is in fact ThebombzenAPI.
+	 * It should only be called independently by ThebombzenAPI itself.
+	 */
+	void initialize(){
+		if (ThebombzenAPI.proxy.isClientProxy()) {
+			toggleKeyCodes = new int[getNumToggleKeys()];
+			toggles = new boolean[getNumToggleKeys()];
+			defaultToggles = new boolean[getNumToggleKeys()];
+		}
+
+		ThebombzenAPI.registerMod(this);
+
+		File mineFile = ThebombzenAPI.proxy.getMinecraftDirectory();
+		File modsFolder = new File(mineFile, "mods");
+		modFolder = new File(modsFolder, getLongName());
+		modFolder.mkdirs();
+
+		debugFile = new File(modFolder, "DEBUG.txt");
+		try {
+			debugLogger = new PrintWriter(new FileWriter(debugFile));
+		} catch (IOException ioe) {
+			debugLogger = null;
+			throwException("Unable to open debug output file.", ioe, false);
+		}
+
+		try {
+			getConfiguration().load();
+		} catch (IOException ioe) {
+			throwException("Unable to open configuration!", ioe, true);
+		}
+	}
+	
 	/**
 	 * This returns the config screen used to configure the mod.
 	 * 
@@ -336,34 +381,7 @@ public abstract class ThebombzenAPIBaseMod {
 	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-
-		if (event.getSide().isClient()) {
-			toggleKeyCodes = new int[getNumToggleKeys()];
-			toggles = new boolean[getNumToggleKeys()];
-			defaultToggles = new boolean[getNumToggleKeys()];
-		}
-
-		ThebombzenAPI.registerMod(this);
-
-		File mineFile = ThebombzenAPI.proxy.getMinecraftDirectory();
-		File modsFolder = new File(mineFile, "mods");
-		modFolder = new File(modsFolder, getLongName());
-		modFolder.mkdirs();
-
-		debugFile = new File(modFolder, "DEBUG.txt");
-		try {
-			debugLogger = new PrintWriter(new FileWriter(debugFile));
-		} catch (IOException ioe) {
-			debugLogger = null;
-			throwException("Unable to open debug output file.", ioe, false);
-		}
-
-		try {
-			getConfiguration().load();
-		} catch (IOException ioe) {
-			throwException("Unable to open configuration!", ioe, true);
-		}
-
+		
 	}
 
 	/**
@@ -380,7 +398,7 @@ public abstract class ThebombzenAPIBaseMod {
 
 	/**
 	 * Read and return memory data from the specified file.
-	 * 
+	 * config
 	 * @param file
 	 *            The file to read from
 	 * @return The NBTTagCompound containing the read data.

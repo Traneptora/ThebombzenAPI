@@ -11,11 +11,10 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
-
-import org.lwjgl.input.Keyboard;
-
+import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigScreen;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -36,7 +35,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author thebombzen
  */
 @Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.0")
-public class ThebombzenAPI {
+public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
 	 * Platform dependent newline. Microsoft thinks it's so cool with its
@@ -48,7 +47,7 @@ public class ThebombzenAPI {
 	/**
 	 * The mod instance, if you couldn't figure that out yourself.
 	 */
-	@Instance(value = "ThebombzenAPI")
+	@Instance(value = "thebombzenapi")
 	public static ThebombzenAPI instance;
 
 	/**
@@ -63,7 +62,7 @@ public class ThebombzenAPI {
 	 * probing schtuff.
 	 */
 	private static Set<ThebombzenAPIBaseMod> mods = new HashSet<ThebombzenAPIBaseMod>();
-
+	
 	/**
 	 * This is the {System.identityHashCode} of the previous client-side world,
 	 * used to detect when a new world has opened. By storing the
@@ -74,13 +73,8 @@ public class ThebombzenAPI {
 	@SideOnly(Side.CLIENT)
 	public static int prevWorld = 0;
 
-	/**
-	 * Keycodes used for ThebombzenAPI (should be empty after forge config
-	 * windows in mc1.7.2).
-	 */
-	@SideOnly(Side.CLIENT)
-	private static int[] thebombzenAPIKeyCodes;
-
+	private ThebombzenAPIMetaConfiguration dummyConfig = null;
+	
 	/**
 	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
 	 * the same items. It depends on multiplicity, but doesn't depend on order.
@@ -314,7 +308,7 @@ public class ThebombzenAPI {
 	}
 
 	/**
-	 * Registers the ThebombzenAPIBaseMod for use with ThebombzenAPI Things will
+	 * Registers the ThebombzenAPIBaseMod for use with ThebombzenAPI. Things will
 	 * probably not work if you don't register the mod. Note that your mod still
 	 * needs to be an FML mod. This won't load it for you.
 	 * 
@@ -452,10 +446,56 @@ public class ThebombzenAPI {
 	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		initialize();
 		FMLCommonHandler.instance().bus().register(this);
-		if (event.getSide().equals(Side.CLIENT)) {
-			thebombzenAPIKeyCodes = new int[] { Keyboard.KEY_B };
+	}
+
+	@Override
+	public ThebombzenAPIConfigScreen createConfigScreen(GuiScreen base) {
+		return null;
+	}
+
+	@Override
+	public ThebombzenAPIConfiguration<?> getConfiguration() {
+		if (dummyConfig == null){
+			dummyConfig = new ThebombzenAPIMetaConfiguration();
 		}
+		return dummyConfig;
+	}
+
+	@Override
+	public String getLongName() {
+		return "ThebombzenAPI";
+	}
+
+	@Override
+	public String getLongVersionString() {
+		return "ThebombzenAPI, version 2.3.0, Minecraft 1.7.2";
+	}
+
+	@Override
+	public int getNumToggleKeys() {
+		return 0;
+	}
+
+	@Override
+	public String getShortName() {
+		return "TBZAPI";
+	}
+
+	@Override
+	protected String getToggleMessageString(int index, boolean enabled) {
+		throw new UnsupportedOperationException("ThebombzenAPI has no toggles!");
+	}
+
+	@Override
+	protected String getVersionFileURLString() {
+		return "https://dl.dropboxusercontent.com/u/51080973/ThebombzenAPI/TBZAPIVersion.txt";
+	}
+
+	@Override
+	public boolean hasConfigScreen() {
+		return false;
 	}
 
 }
