@@ -24,6 +24,14 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * This class is the superclass of Thebombzen's mods. Extend this to get
+ * ThebombzenAPI functionality. I'm using inheritance rather than annotations
+ * because annotation stuff is hard :-(. Actually, it's because it's practical,
+ * because Forge doesn't require inheritance.
+ * 
+ * @author thebombzen
+ */
 public abstract class ThebombzenAPIBaseMod {
 
 	/**
@@ -337,7 +345,7 @@ public abstract class ThebombzenAPIBaseMod {
 
 		ThebombzenAPI.registerMod(this);
 
-		File mineFile = ThebombzenAPI.proxy.getMinecraftFolder();
+		File mineFile = ThebombzenAPI.proxy.getMinecraftDirectory();
 		File modsFolder = new File(mineFile, "mods");
 		modFolder = new File(modsFolder, getLongName());
 		modFolder.mkdirs();

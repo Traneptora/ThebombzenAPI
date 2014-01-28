@@ -7,17 +7,25 @@ import thebombzen.mods.thebombzenapi.CommonProxy;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * This class provides client-side-specific functions.
+ * 
+ * @author thebombzen
+ */
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
-	
+
+	/**
+	 * Returns your .minecraft directory.
+	 */
 	@Override
-	public File getMinecraftFolder() {
+	public File getMinecraftDirectory() {
 		return Minecraft.getMinecraft().mcDataDir;
 	}
-	
+
 	@Override
-	public boolean isClientProxy(){
+	public boolean isClientProxy() {
 		return true;
 	}
-	
+
 }

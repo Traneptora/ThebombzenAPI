@@ -30,6 +30,11 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * This is the core of the API and contains many utility functions.
+ * 
+ * @author thebombzen
+ */
 @Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.0")
 public class ThebombzenAPI {
 
