@@ -76,6 +76,36 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	private ThebombzenAPIMetaConfiguration dummyConfig = null;
 	
 	/**
+	 * Parse an integer literal the way java would.
+	 * That is, a decimal number is parsed as is,
+	 * A number starting with 0 is octal, 0x is hexadecimal, and 0b is binary.
+	 * Negatives will only be parsed if the minus sign comes AFTER the 0x/0b/0.
+	 * @param The string to parse
+	 * @return The integer value
+	 * @throws NumberFormatException if the number is invalid.
+	 */
+	public static int parseInteger(String s){
+		s = s.replace("_", "");
+		if (s.length() == 0){
+			throw new NumberFormatException();
+		}
+		if (s.charAt(0) != '0'){
+			return Integer.parseInt(s);
+		}
+		if (s.length() == 1){
+			return 0;
+		}
+		switch (s.charAt(1)){
+		case 'x':
+			return Integer.parseInt(s.substring(2), 16);
+		case 'b':
+			return Integer.parseInt(s.substring(2), 2);
+		default:
+			return Integer.parseInt(s, 8);
+		}
+	}
+	
+	/**
 	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
 	 * the same items. It depends on multiplicity, but doesn't depend on order.
 	 * Note that it will return false if comparing 2 Dirt + 2 Dirt to 1 Dirt + 3
