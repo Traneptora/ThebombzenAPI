@@ -1,6 +1,9 @@
 package thebombzen.mods.thebombzenapi;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,6 +12,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -73,38 +78,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	@SideOnly(Side.CLIENT)
 	public static int prevWorld = 0;
 
-	private ThebombzenAPIMetaConfiguration dummyConfig = null;
-	
-	/**
-	 * Parse an integer literal the way java would.
-	 * That is, a decimal number is parsed as is,
-	 * A number starting with 0 is octal, 0x is hexadecimal, and 0b is binary.
-	 * Negatives will only be parsed if the minus sign comes AFTER the 0x/0b/0.
-	 * @param The string to parse
-	 * @return The integer value
-	 * @throws NumberFormatException if the number is invalid.
-	 */
-	public static int parseInteger(String s){
-		s = s.replace("_", "");
-		if (s.length() == 0){
-			throw new NumberFormatException();
-		}
-		if (s.charAt(0) != '0'){
-			return Integer.parseInt(s);
-		}
-		if (s.length() == 1){
-			return 0;
-		}
-		switch (s.charAt(1)){
-		case 'x':
-			return Integer.parseInt(s.substring(2), 16);
-		case 'b':
-			return Integer.parseInt(s.substring(2), 2);
-		default:
-			return Integer.parseInt(s, 8);
-		}
-	}
-	
 	/**
 	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
 	 * the same items. It depends on multiplicity, but doesn't depend on order.
@@ -145,17 +118,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return true;
 	}
-
-	/**
-	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
-	 * itself, because they're all FML mods anyway.
-	 * 
-	 * @return the list of registered {ThebombzenAPIBaseMod}.
-	 */
-	public static ThebombzenAPIBaseMod[] getMods() {
-		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
-	}
-
 	/**
 	 * Get the value of a private field.
 	 * 
@@ -171,6 +133,52 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static <T> T getPrivateField(Object arg, Class<?> clazz, String name) {
 		return getPrivateField(arg, clazz, new String[] { name });
+	}
+	
+	/**
+	 * Turn a {java.util.Collection} of {Integer}s into an array of {int}.
+	 * {java.util.Collection.toArray()} doesn't let you do this.
+	 * 
+	 * @param coll
+	 *            The {java.util.Collection} to convert.
+	 * @return An array of {int}.
+	 */
+	public static int[] intArrayFromIntegerCollection(
+			Collection<? extends Integer> coll) {
+		List<Integer> ret = new ArrayList<>();
+		ret.addAll(coll);
+		return intArrayFromIntegerList(ret);
+	}
+	
+	/**
+	 * Correctly converts an {int[]} to {java.util.List<Integer>}, because
+	 * {java.util.Arrays.asList()} converts it to a {java.util.List<int[]>} with
+	 * one element.
+	 * 
+	 * @param Array
+	 *            of {int}
+	 * @return {java.util.List} of {Integer}
+	 */
+	public static List<Integer> intArrayToIntegerList(int[] array) {
+		List<Integer> ret = new ArrayList<>(array.length);
+		for (int i : array) {
+			ret.add(i);
+		}
+		return ret;
+	}
+	
+	private ThebombzenAPIMetaConfiguration dummyConfig = null;
+	
+	private static JarFile jarFile = null;
+
+	/**
+	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
+	 * itself, because they're all FML mods anyway.
+	 * 
+	 * @return the list of registered {ThebombzenAPIBaseMod}.
+	 */
+	public static ThebombzenAPIBaseMod[] getMods() {
+		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
 	}
 
 	/**
@@ -206,19 +214,15 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return null;
 	}
 
-	/**
-	 * Turn a {java.util.Collection} of {Integer}s into an array of {int}.
-	 * {java.util.Collection.toArray()} doesn't let you do this.
-	 * 
-	 * @param coll
-	 *            The {java.util.Collection} to convert.
-	 * @return An array of {int}.
-	 */
-	public static int[] intArrayFromIntegerCollection(
-			Collection<? extends Integer> coll) {
-		List<Integer> ret = new ArrayList<>();
-		ret.addAll(coll);
-		return intArrayFromIntegerList(ret);
+	public static InputStream getResourceAsStream(Object mod, String resourceName) throws IOException {
+		File source = FMLCommonHandler.instance().findContainerFor(mod).getSource();
+		if (source.isDirectory()){
+			return new FileInputStream(new File(source, resourceName));
+		} else {
+			jarFile = new JarFile(source);
+			JarEntry entry = jarFile.getJarEntry(resourceName);
+			return jarFile.getInputStream(entry);
+		}
 	}
 
 	/**
@@ -233,23 +237,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		int[] ret = new int[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
-		}
-		return ret;
-	}
-
-	/**
-	 * Correctly converts an {int[]} to {java.util.List<Integer>}, because
-	 * {java.util.Arrays.asList()} converts it to a {java.util.List<int[]>} with
-	 * one element.
-	 * 
-	 * @param Array
-	 *            of {int}
-	 * @return {java.util.List} of {Integer}
-	 */
-	public static List<Integer> intArrayToIntegerList(int[] array) {
-		List<Integer> ret = new ArrayList<>(array.length);
-		for (int i : array) {
-			ret.add(i);
 		}
 		return ret;
 	}
@@ -335,6 +322,50 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Parse an integer literal the way java would.
+	 * That is, a decimal number is parsed as is,
+	 * A number starting with 0 is octal, 0x is hexadecimal, and 0b is binary.
+	 * Negatives will only be parsed if the minus sign comes AFTER the 0x/0b/0.
+	 * @param The string to parse
+	 * @return The integer value
+	 * @throws NumberFormatException if the number is invalid.
+	 */
+	public static int parseInteger(String s){
+		s = s.replace("_", "");
+		boolean onecomp = s.charAt(0) == '~';
+		if (onecomp){
+			s = s.substring(1);
+		}
+		if (s.length() == 0){
+			throw new NumberFormatException();
+		}
+		if (s.charAt(0) != '0'){
+			return Integer.parseInt(s);
+		}
+		if (s.length() == 1){
+			return 0;
+		}
+		int i;
+		switch (s.charAt(1)){
+		case 'x':
+		case 'X':
+			i = Integer.parseInt(s.substring(2), 16);
+			break;
+		case 'b':
+		case 'B':
+			i = Integer.parseInt(s.substring(2), 2);
+			break;
+		default:
+			i = Integer.parseInt(s, 8);
+			break;
+		}
+		if (onecomp){
+			i = ~i;
+		}
+		return i;
 	}
 
 	/**
@@ -449,40 +480,14 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		prevWorld = currWorld;
 	}
 
-	/**
-	 * FML load method. Does load stuff.
-	 * 
-	 * @param event
-	 */
-	@EventHandler
-	public void load(FMLInitializationEvent event) {
-
-	}
-
-	/**
-	 * FML postInit method. Does postInit stuff.
-	 * 
-	 * @param event
-	 */
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-
-	}
-
-	/**
-	 * FML preInitMethod. Does preInit stuff.
-	 * 
-	 * @param event
-	 */
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		initialize();
-		FMLCommonHandler.instance().bus().register(this);
-	}
-
 	@Override
 	public ThebombzenAPIConfigScreen createConfigScreen(GuiScreen base) {
 		return null;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		jarFile.close();
 	}
 
 	@Override
@@ -520,12 +525,43 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	protected String getVersionFileURLString() {
-		return "https://dl.dropboxusercontent.com/u/51080973/ThebombzenAPI/TBZAPIVersion.txt";
+		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
 	}
 
 	@Override
 	public boolean hasConfigScreen() {
 		return false;
+	}
+
+	/**
+	 * FML load method. Does load stuff.
+	 * 
+	 * @param event
+	 */
+	@EventHandler
+	public void load(FMLInitializationEvent event) {
+
+	}
+
+	/**
+	 * FML postInit method. Does postInit stuff.
+	 * 
+	 * @param event
+	 */
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+
+	}
+
+	/**
+	 * FML preInitMethod. Does preInit stuff.
+	 * 
+	 * @param event
+	 */
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		initialize();
+		FMLCommonHandler.instance().bus().register(this);
 	}
 
 }

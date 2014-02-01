@@ -19,8 +19,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
 import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigScreen;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -90,40 +88,6 @@ public abstract class ThebombzenAPIBaseMod {
 	}
 	
 	/**
-	 * This is the init routine. It is separate from the constructor because
-	 * it crashes if this mod is in fact ThebombzenAPI.
-	 * It should only be called independently by ThebombzenAPI itself.
-	 */
-	void initialize(){
-		if (ThebombzenAPI.sideSpecificUtilities.isClient()) {
-			toggleKeyCodes = new int[getNumToggleKeys()];
-			toggles = new boolean[getNumToggleKeys()];
-			defaultToggles = new boolean[getNumToggleKeys()];
-		}
-
-		ThebombzenAPI.registerMod(this);
-
-		File mineFile = ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory();
-		File modsFolder = new File(mineFile, "mods");
-		modFolder = new File(modsFolder, getLongName());
-		modFolder.mkdirs();
-
-		debugFile = new File(modFolder, "DEBUG.txt");
-		try {
-			debugLogger = new PrintWriter(new FileWriter(debugFile));
-		} catch (IOException ioe) {
-			debugLogger = null;
-			throwException("Unable to open debug output file.", ioe, false);
-		}
-
-		try {
-			getConfiguration().load();
-		} catch (IOException ioe) {
-			throwException("Unable to open configuration!", ioe, true);
-		}
-	}
-	
-	/**
 	 * This returns the config screen used to configure the mod.
 	 * 
 	 * @param The
@@ -131,7 +95,7 @@ public abstract class ThebombzenAPIBaseMod {
 	 */
 	@SideOnly(Side.CLIENT)
 	public abstract ThebombzenAPIConfigScreen createConfigScreen(GuiScreen base);
-
+	
 	/**
 	 * This finalizer closes the debug logger upon a crash or other closure.
 	 */
@@ -149,7 +113,7 @@ public abstract class ThebombzenAPIBaseMod {
 	 * @param string
 	 *            The {String} to write.
 	 */
-	protected void forceDebug(String string) {
+	public void forceDebug(String string) {
 		forceDebug("%s", string);
 	}
 
@@ -162,7 +126,7 @@ public abstract class ThebombzenAPIBaseMod {
 	 * @param args
 	 *            The format arguments.
 	 */
-	protected void forceDebug(String format, Object... args) {
+	public void forceDebug(String format, Object... args) {
 		String s = String.format(format, args);
 		if (s.matches("=+")) {
 			String total = debugBuilder.toString();
@@ -340,6 +304,35 @@ public abstract class ThebombzenAPIBaseMod {
 	public abstract boolean hasConfigScreen();
 
 	/**
+	 * This is the init routine. It is separate from the constructor because
+	 * it crashes if this mod is in fact ThebombzenAPI.
+	 * It should only be called independently by ThebombzenAPI itself.
+	 * YOU HAVE TO LOAD YOUR CONFIGURATION YOURSELF IN postInit!
+	 */
+	void initialize(){
+		if (ThebombzenAPI.sideSpecificUtilities.isClient()) {
+			toggleKeyCodes = new int[getNumToggleKeys()];
+			toggles = new boolean[getNumToggleKeys()];
+			defaultToggles = new boolean[getNumToggleKeys()];
+		}
+
+		ThebombzenAPI.registerMod(this);
+
+		File mineFile = ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory();
+		File modsFolder = new File(mineFile, "mods");
+		modFolder = new File(modsFolder, getLongName());
+		modFolder.mkdirs();
+
+		debugFile = new File(modFolder, "DEBUG.txt");
+		try {
+			debugLogger = new PrintWriter(new FileWriter(debugFile));
+		} catch (IOException ioe) {
+			debugLogger = null;
+			throwException("Unable to open debug output file.", ioe, false);
+		}
+	}
+
+	/**
 	 * Determines if the toggle is "default enabled," or will enable on unknown
 	 * worlds/servers.
 	 * 
@@ -374,14 +367,6 @@ public abstract class ThebombzenAPIBaseMod {
 			throw new IndexOutOfBoundsException();
 		}
 		return toggles[index];
-	}
-
-	/**
-	 * FML preInit method. Does preInit stuff.
-	 */
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		
 	}
 
 	/**
@@ -572,5 +557,4 @@ public abstract class ThebombzenAPIBaseMod {
 			throwException("Couldn't write to memory file.", ioe, false);
 		}
 	}
-
 }

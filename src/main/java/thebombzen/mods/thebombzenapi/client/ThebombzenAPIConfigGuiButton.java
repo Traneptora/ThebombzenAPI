@@ -83,12 +83,10 @@ public class ThebombzenAPIConfigGuiButton extends GuiButton {
 	}
 
 	/**
-	 * Formerly "drawTooltip" This draws the tooltip over the button, and calls
+	 * This draws the tooltip over the button, and calls
 	 * the superclass draw function.
 	 */
-	@Override
-	public void func_146112_a(Minecraft minecraft, int i, int j) {
-		super.func_146112_a(minecraft, i, j);
+	public void drawTooltip(Minecraft minecraft, int i, int j) {
 
 		// field_146120_f == width
 		// field_146121_g == height

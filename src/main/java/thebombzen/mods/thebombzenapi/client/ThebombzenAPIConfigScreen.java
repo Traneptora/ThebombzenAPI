@@ -89,13 +89,13 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 		super.drawScreen(i, j, f);
 		// field_146297_k == mc
 		for (ThebombzenAPIConfigGuiButton button : tooltipButtons.keySet()) {
-			button.func_146112_a(field_146297_k, i, j);
+			button.drawTooltip(field_146297_k, i, j);
 		}
 	}
 
 	/**
 	 * Perform an action upon mouse click.
-	 * 
+	 * Formerly actionPerformed
 	 * @param button
 	 *            the GuiButton that was pressed.
 	 */
