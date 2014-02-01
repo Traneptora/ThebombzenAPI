@@ -98,8 +98,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			return false;
 		}
 
-		List<ItemStack> list1 = new ArrayList<>(coll1);
-		List<ItemStack> list2 = new ArrayList<>(coll2);
+		List<ItemStack> list1 = new ArrayList<ItemStack>(coll1);
+		List<ItemStack> list2 = new ArrayList<ItemStack>(coll2);
 
 		Iterator<ItemStack> iter1 = list1.iterator();
 
@@ -145,7 +145,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static int[] intArrayFromIntegerCollection(
 			Collection<? extends Integer> coll) {
-		List<Integer> ret = new ArrayList<>();
+		List<Integer> ret = new ArrayList<Integer>();
 		ret.addAll(coll);
 		return intArrayFromIntegerList(ret);
 	}
@@ -160,7 +160,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @return {java.util.List} of {Integer}
 	 */
 	public static List<Integer> intArrayToIntegerList(int[] array) {
-		List<Integer> ret = new ArrayList<>(array.length);
+		List<Integer> ret = new ArrayList<Integer>(array.length);
 		for (int i : array) {
 			ret.add(i);
 		}
