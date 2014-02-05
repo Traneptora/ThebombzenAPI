@@ -19,6 +19,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
 import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigScreen;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -101,9 +105,7 @@ public abstract class ThebombzenAPIBaseMod {
 	 */
 	@Override
 	protected void finalize() throws Throwable {
-		if (debugLogger != null) {
-			debugLogger.close();
-		}
+		debugLogger.close();
 	}
 
 	/**
@@ -480,6 +482,30 @@ public abstract class ThebombzenAPIBaseMod {
 					.func_146105_b(new ChatComponentText(
 							getToggleMessageString(index, enabled)));
 		}
+
+	}
+	
+	
+	/**
+	 * FML preInit method. Does preInit stuff.
+	 */
+	public void init1(FMLPreInitializationEvent event) {
+		
+	}
+	
+	/**
+	 * FML load method. Does load stuff.
+	 */
+	@EventHandler
+	public void init2(FMLInitializationEvent event) {
+		
+	}
+
+	/**
+	 * FML postInit method. Does postInit stuff.
+	 */
+	@EventHandler
+	public void init3(FMLPostInitializationEvent event) {
 
 	}
 

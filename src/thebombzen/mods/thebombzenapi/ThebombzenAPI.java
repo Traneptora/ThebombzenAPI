@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -29,6 +31,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
@@ -39,7 +42,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.0")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.1")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -532,27 +535,20 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public boolean hasConfigScreen() {
 		return false;
 	}
-
-	/**
-	 * FML load method. Does load stuff.
-	 * 
-	 * @param event
-	 */
-	@EventHandler
-	public void load(FMLInitializationEvent event) {
-
+	
+	@SubscribeEvent
+	public void handleKeyPress(KeyInputEvent event){
+		for (ThebombzenAPIBaseMod mod : mods){
+			int num = mod.getNumToggleKeys();
+			for (int i = 0; i < num; i++){
+				if (Keyboard.isKeyDown(mod.getToggleKeyCode(i)) && !Keyboard.isRepeatEvent()){
+					boolean enabled = mod.isToggleEnabled(i);
+					mod.setToggleEnabled(i, !enabled, true);
+				}
+			}
+		}
 	}
-
-	/**
-	 * FML postInit method. Does postInit stuff.
-	 * 
-	 * @param event
-	 */
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-
-	}
-
+	
 	/**
 	 * FML preInitMethod. Does preInit stuff.
 	 * 
@@ -562,6 +558,33 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public void preInit(FMLPreInitializationEvent event) {
 		initialize();
 		FMLCommonHandler.instance().bus().register(this);
+		for (ThebombzenAPIBaseMod mod : mods){
+			mod.init1(event);
+		}
+	}
+
+	/**
+	 * FML load method. Does load stuff.
+	 * 
+	 * @param event
+	 */
+	@EventHandler
+	public void load(FMLInitializationEvent event) {
+		for (ThebombzenAPIBaseMod mod : mods){
+			mod.init2(event);
+		}
+	}
+
+	/**
+	 * FML postInit method. Does postInit stuff.
+	 * 
+	 * @param event
+	 */
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		for (ThebombzenAPIBaseMod mod : mods){
+			mod.init3(event);
+		}
 	}
 
 }
