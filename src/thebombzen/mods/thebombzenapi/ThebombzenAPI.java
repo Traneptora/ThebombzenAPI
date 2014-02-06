@@ -42,7 +42,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.1")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.2")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -508,7 +508,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.3.0, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.3.2, Minecraft 1.7.2";
 	}
 
 	@Override
