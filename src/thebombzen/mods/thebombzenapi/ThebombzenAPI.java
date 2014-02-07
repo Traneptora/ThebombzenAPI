@@ -8,19 +8,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
+
+import org.lwjgl.input.Keyboard;
+
 import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigScreen;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -69,7 +71,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * register itself because it's easier for me than that fancy classpath
 	 * probing schtuff.
 	 */
-	private static Set<ThebombzenAPIBaseMod> mods = new HashSet<ThebombzenAPIBaseMod>();
+	private static SortedSet<ThebombzenAPIBaseMod> mods = new TreeSet<ThebombzenAPIBaseMod>();
 	
 	/**
 	 * This is the {System.identityHashCode} of the previous client-side world,
@@ -460,8 +462,10 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				String latestVersion = mod.getLatestVersion();
 				if (!latestVersion.equals(mod.getLongVersionString())) {
-					mc.thePlayer.func_146105_b(new ChatComponentText(
-							latestVersion + " is available."));
+					mc.thePlayer.addChatMessage(new ChatComponentText(
+							latestVersion + " is available. "));
+					mc.thePlayer.addChatMessage(IChatComponent.Serializer.func_150699_a("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+					
 				}
 			}
 		}
@@ -585,6 +589,10 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.init3(event);
 		}
+	}
+	@Override
+	public String getDownloadLocationURLString() {
+		return "http://is.gd/ThebombzensMods#ThebombzenAPI";
 	}
 
 }

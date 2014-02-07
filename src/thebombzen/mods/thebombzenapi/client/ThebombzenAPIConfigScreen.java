@@ -81,15 +81,15 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	@Override
 	public void drawScreen(int i, int j, float f) {
 		// func_146276_q_ == drawDefaultBackground()
-		func_146276_q_();
+		this.drawDefaultBackground();
 		// field_146289_q == fontRenderer
 		// field_146294_l == width
-		this.drawCenteredString(field_146289_q, title, field_146294_l / 2, 10,
+		this.drawCenteredString(fontRendererObj, title, width / 2, 10,
 				16777215);
 		super.drawScreen(i, j, f);
 		// field_146297_k == mc
 		for (ThebombzenAPIConfigGuiButton button : tooltipButtons.keySet()) {
-			button.drawTooltip(field_146297_k, i, j);
+			button.drawTooltip(mc, i, j);
 		}
 	}
 
@@ -100,12 +100,12 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	 *            the GuiButton that was pressed.
 	 */
 	@Override
-	protected void func_146284_a(GuiButton button) {
-		int id = button.field_146127_k;
+	protected void actionPerformed(GuiButton button) {
+		int id = button.id;
 		if (id == 4912) {
 			// field_146297_k == mc
 			// func_147108_a == displayGuiScreen
-			field_146297_k.func_147108_a(this.parentScreen);
+			mc.displayGuiScreen(this.parentScreen);
 			return;
 		} else if (id >= 4913) {
 			ThebombzenAPIConfigOption option = tooltipButtons.get(button);
@@ -113,21 +113,21 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 				boolean newProp = !config.getPropertyBoolean(option);
 				config.setProperty(option, Boolean.toString(newProp));
 				// field_146128_j == displayString
-				button.field_146126_j = getDisplayGuiString(option);
+				button.displayString = getDisplayGuiString(option);
 			} else if (option.getOptionType() == ThebombzenAPIConfigOption.FINITE_STRING) {
 				String[] strings = option.getFiniteStringOptions();
 				int index = Arrays.asList(strings).indexOf(
 						config.getProperty(option));
 				index = (index + 1) % strings.length;
 				config.setProperty(option, strings[index]);
-				button.field_146126_j = getDisplayGuiString(option);
+				button.displayString = getDisplayGuiString(option);
 			} else if (option.getOptionType() == ThebombzenAPIConfigOption.KEY) {
 				if (button != currentKeyButton) {
 					if (currentKeyButton != null) {
-						currentKeyButton.field_146126_j = getDisplayGuiString(tooltipButtons
+						currentKeyButton.displayString = getDisplayGuiString(tooltipButtons
 								.get(currentKeyButton));
 					}
-					button.field_146126_j = option.getShortInfo() + ": > ??? <";
+					button.displayString = option.getShortInfo() + ": > ??? <";
 					currentKeyButton = button;
 				}
 			}
@@ -165,16 +165,16 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 			// field_146294_l == width
 			// field_146295_m == height
 			ThebombzenAPIConfigGuiButton button = new ThebombzenAPIConfigGuiButton(
-					this, 4913 + i, field_146294_l / 2 - 206 + (i % 2) * 207,
-					field_146295_m / 6 + 23 * (i >> 1) - 18, 205, 20,
+					this, 4913 + i, width / 2 - 206 + (i % 2) * 207,
+					height / 6 + 23 * (i >> 1) - 18, 205, 20,
 					getDisplayGuiString(option), option.getInfo());
 			i++;
 			// field_146292_n == buttonList
-			field_146292_n.add(button);
+			buttonList.add(button);
 			tooltipButtons.put(button, option);
 		}
-		field_146292_n.add(new GuiButton(4912, field_146294_l / 2 - 100,
-				field_146295_m / 6 + 168, 200, 20, StatCollector
+		buttonList.add(new GuiButton(4912, width / 2 - 100,
+				height / 6 + 168, 200, 20, StatCollector
 						.translateToLocal("gui.done")));
 	}
 
@@ -189,7 +189,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 					.get(currentKeyButton);
 			config.setProperty(option, Keyboard.getKeyName(keyCode));
 			// field_146126_j == displayString
-			currentKeyButton.field_146126_j = getDisplayGuiString(option);
+			currentKeyButton.displayString = getDisplayGuiString(option);
 			currentKeyButton = null;
 		}
 	}

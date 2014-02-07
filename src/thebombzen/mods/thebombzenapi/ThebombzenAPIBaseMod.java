@@ -34,7 +34,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * You still need a Mod annotation on your mod. This will not load your mod for you.
  * @author thebombzen
  */
-public abstract class ThebombzenAPIBaseMod {
+public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBaseMod> {
 
 	/**
 	 * Array of keycodes that toggle boolean values.
@@ -478,9 +478,7 @@ public abstract class ThebombzenAPIBaseMod {
 		}
 		toggles[index] = enabled;
 		if (keyPress) {
-			Minecraft.getMinecraft().thePlayer
-					.func_146105_b(new ChatComponentText(
-							getToggleMessageString(index, enabled)));
+			Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(getToggleMessageString(index, enabled)));
 		}
 
 	}
@@ -583,4 +581,21 @@ public abstract class ThebombzenAPIBaseMod {
 			throwException("Couldn't write to memory file.", ioe, false);
 		}
 	}
+	
+	@Override
+	public int compareTo(ThebombzenAPIBaseMod mod){
+		if (this == mod){
+			return 0;
+		}
+		if (this instanceof ThebombzenAPI){
+			return -1;
+		}
+		if (mod instanceof ThebombzenAPI){
+			return 1;
+		}
+		return this.getLongName().compareTo(mod.getLongName());
+	}
+	
+	public abstract String getDownloadLocationURLString();
+	
 }

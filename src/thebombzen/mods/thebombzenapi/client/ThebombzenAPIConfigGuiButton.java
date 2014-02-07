@@ -93,9 +93,9 @@ public class ThebombzenAPIConfigGuiButton extends GuiButton {
 		// field_146128_h == xPosition
 		// field_146129_i == yPosition
 
-		if (i >= field_146128_h && j >= field_146129_i
-				&& i < (field_146128_h + field_146120_f)
-				&& j < (field_146129_i + field_146121_g)) {
+		if (i >= xPosition && j >= yPosition
+				&& i < (xPosition + width)
+				&& j < (yPosition + height)) {
 
 			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
 
@@ -111,7 +111,7 @@ public class ThebombzenAPIConfigGuiButton extends GuiButton {
 			}
 
 			// field_146294_l == width
-			if (x + toolTipWidth >= parentScreen.field_146294_l) {
+			if (x + toolTipWidth >= parentScreen.width) {
 				x -= toolTipWidth + 24;
 			}
 
