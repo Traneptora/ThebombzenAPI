@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.2")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.3")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -512,7 +512,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.3.2, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.3.3, Minecraft 1.7.2";
 	}
 
 	@Override
@@ -548,6 +548,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 				if (Keyboard.isKeyDown(mod.getToggleKeyCode(i)) && !Keyboard.isRepeatEvent()){
 					boolean enabled = mod.isToggleEnabled(i);
 					mod.setToggleEnabled(i, !enabled, true);
+					mod.writeToCorrectMemoryFile();
 				}
 			}
 		}
