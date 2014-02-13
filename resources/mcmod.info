@@ -8,8 +8,9 @@
   "url": "http://is.gd/ThebombzensMods#ThebombzenAPI",
   "updateUrl": "",
   "credits": "Thebombzen",
-  "logoFile": "",
+  "authors": [ "Thebombzen" ],
   "screenshots": [],
   "dependencies": []
 }
 ]
+
