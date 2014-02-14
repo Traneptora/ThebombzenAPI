@@ -63,7 +63,7 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 			Class<T> optionClass) {
 		mod = baseMod;
 		this.optionClass = optionClass;
-		propsFile = new File(ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory().getPath() + File.separator + "config" + File.separator + File.separator + mod.getLongName() + ".cfg");
+		propsFile = new File(ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory().getPath() + File.separator + "config" + File.separator + mod.getLongName() + ".txt");
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 	/**
 	 * Returns the file storing this mod's basic properties.
 	 */
-	protected File getPropertyFile() {
+	public File getPropertyFile() {
 		return this.propsFile;
 	}
 

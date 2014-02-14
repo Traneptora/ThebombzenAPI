@@ -42,7 +42,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.3")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.4")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -55,7 +55,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * The mod instance
 	 */
-	@Instance(value = "thebombzenapi")
+	@Instance("thebombzenapi")
 	public static ThebombzenAPI instance;
 
 	/**
@@ -79,7 +79,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * detect a world change.
 	 */
 	@SideOnly(Side.CLIENT)
-	public static int prevWorld = 0;
+	public static int prevWorld;
+	
+	private static JarFile jarFile = null;
 
 	/**
 	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
@@ -169,10 +171,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return ret;
 	}
-	
-	private ThebombzenAPIMetaConfiguration dummyConfig = null;
-	
-	private static JarFile jarFile = null;
 
 	/**
 	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
@@ -345,14 +343,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		if (s.length() == 0){
 			throw new NumberFormatException();
 		}
-		if (s.charAt(0) != '0'){
-			return Integer.parseInt(s);
-		}
-		if (s.length() == 1){
-			return 0;
-		}
 		int i;
-		switch (s.charAt(1)){
+		if (s.charAt(0) != '0'){
+			i = Integer.parseInt(s);
+		} else if (s.length() == 1){
+			i = 0;
+		} else switch (s.charAt(1)){
 		case 'x':
 		case 'X':
 			i = Integer.parseInt(s.substring(2), 16);
@@ -434,6 +430,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 	}
 
+	private ThebombzenAPIMetaConfiguration dummyConfig = null;
+	
 	/**
 	 * Main client tick loop.
 	 * 
@@ -506,7 +504,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.3.3, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.3.4, Minecraft 1.7.2";
 	}
 
 	@Override

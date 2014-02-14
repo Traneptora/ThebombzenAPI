@@ -19,6 +19,7 @@ import java.util.jar.JarFile;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,7 +28,7 @@ import javax.swing.JTextField;
 
 public class APIInstallerFrame extends JFrame {
 	
-	private static final long serialVersionUID = 316486537931642186L;
+	private static final long serialVersionUID = 1L;
 	private JTextField textField;
 	private JRadioButton installClient;
 	private JRadioButton installServer;
@@ -131,7 +132,7 @@ public class APIInstallerFrame extends JFrame {
 	}
 
 	public APIInstallerFrame() throws IOException {
-		
+		final APIInstallerFrame frame = this;
 		Box superBox = Box.createHorizontalBox();
 		superBox.add(Box.createHorizontalStrut(10));
 		
@@ -161,9 +162,14 @@ public class APIInstallerFrame extends JFrame {
 		labelBox.add(Box.createHorizontalGlue());
 		content.add(labelBox);
 		
+		Box textBox = Box.createHorizontalBox();
 		textField = new JTextField();
 		textField.setText(clientDirectory);
-		content.add(textField);
+		textBox.add(textField);
+		textBox.add(Box.createHorizontalStrut(10));
+		JButton browseButton = new JButton("Browse");
+		textBox.add(browseButton);
+		content.add(textBox);
 		
 		content.add(Box.createVerticalStrut(10));
 		
@@ -212,6 +218,18 @@ public class APIInstallerFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent ae){
 				install();
+			}
+		});
+		
+		browseButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setMultiSelectionEnabled(false);
+				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int result = jfc.showOpenDialog(frame);
+				if (result == JFileChooser.APPROVE_OPTION){
+					textField.setText(jfc.getSelectedFile().getAbsolutePath());
+				}
 			}
 		});
 		
