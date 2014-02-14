@@ -13,13 +13,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
-import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigScreen;
-import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -90,15 +87,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			initialize();
 		}
 	}
-	
-	/**
-	 * This returns the config screen used to configure the mod.
-	 * 
-	 * @param The
-	 *            screen that came before it.
-	 */
-	@SideOnly(Side.CLIENT)
-	public abstract ThebombzenAPIConfigScreen createConfigScreen(GuiScreen base);
 	
 	/**
 	 * This finalizer closes the debug logger upon a crash or other closure.
@@ -298,14 +286,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	protected abstract String getVersionFileURLString();
 
 	/**
-	 * Does this mod have a config screen?
-	 * 
-	 * @return true if yes, false if no
-	 */
-	@SideOnly(Side.CLIENT)
-	public abstract boolean hasConfigScreen();
-
-	/**
 	 * This is the init routine. It is separate from the constructor because
 	 * it crashes if this mod is in fact ThebombzenAPI.
 	 * It should only be called independently by ThebombzenAPI itself.
@@ -494,7 +474,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	/**
 	 * FML load method. Does load stuff.
 	 */
-	@EventHandler
 	public void init2(FMLInitializationEvent event) {
 		
 	}
@@ -502,7 +481,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	/**
 	 * FML postInit method. Does postInit stuff.
 	 */
-	@EventHandler
 	public void init3(FMLPostInitializationEvent event) {
 
 	}

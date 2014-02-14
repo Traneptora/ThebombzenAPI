@@ -16,14 +16,12 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 
 import org.lwjgl.input.Keyboard;
 
-import thebombzen.mods.thebombzenapi.client.ThebombzenAPIConfigScreen;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -488,12 +486,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 
 	@Override
-	public ThebombzenAPIConfigScreen createConfigScreen(GuiScreen base) {
-		return null;
-	}
-
-	@Override
 	protected void finalize() throws Throwable {
+		super.finalize();
 		jarFile.close();
 	}
 
@@ -533,11 +527,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	@Override
 	protected String getVersionFileURLString() {
 		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
-	}
-
-	@Override
-	public boolean hasConfigScreen() {
-		return false;
 	}
 	
 	@SubscribeEvent
