@@ -565,6 +565,11 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
 		for (ThebombzenAPIBaseMod mod : mods){
+			try {
+				mod.getConfiguration().load();
+			} catch (IOException ioe) {
+				throwException("Unable to open configuration!", ioe, true);
+			}
 			mod.init2(event);
 		}
 	}
@@ -580,6 +585,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			mod.init3(event);
 		}
 	}
+	
 	@Override
 	public String getDownloadLocationURLString() {
 		return "http://is.gd/ThebombzensMods#ThebombzenAPI";

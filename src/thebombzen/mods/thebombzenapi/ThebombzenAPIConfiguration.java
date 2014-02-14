@@ -18,7 +18,7 @@ import java.util.Properties;
  * @param <T>
  *            This must be a ThebombzenAPIConfigOption and an Enum.
  */
-public abstract class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigOption> {
+public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigOption> {
 
 	/**
 	 * The mod this option is for.
@@ -63,9 +63,7 @@ public abstract class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenA
 			Class<T> optionClass) {
 		mod = baseMod;
 		this.optionClass = optionClass;
-		propsFile = new File(new File(
-				ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory(), "config"), mod
-				.getClass().getSimpleName() + ".cfg");
+		propsFile = new File(ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory().getPath() + File.separator + "config" + File.separator + File.separator + mod.getLongName() + ".cfg");
 	}
 
 	/**

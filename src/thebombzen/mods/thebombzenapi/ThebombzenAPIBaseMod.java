@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -292,7 +293,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * YOU HAVE TO LOAD YOUR CONFIGURATION YOURSELF IN postInit!
 	 */
 	void initialize(){
-		if (ThebombzenAPI.sideSpecificUtilities.isClient()) {
+		
+		if (FMLCommonHandler.instance().getSide().isClient()) {
 			toggleKeyCodes = new int[getNumToggleKeys()];
 			toggles = new boolean[getNumToggleKeys()];
 			defaultToggles = new boolean[getNumToggleKeys()];
