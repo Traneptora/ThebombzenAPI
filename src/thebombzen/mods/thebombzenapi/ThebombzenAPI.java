@@ -125,6 +125,50 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return true;
 	}
+	private static String getDescriptorName(Class<?> clazz){
+		if (clazz == null){
+			return null;
+		}
+		if (byte.class.equals(clazz)){
+			return "B";
+		} else if (short.class.equals(clazz)){
+			return "S";
+		} else if (int.class.equals(clazz)){
+			return "I";
+		} else if (long.class.equals(clazz)){
+			return "J";
+		} else if (double.class.equals(clazz)){
+			return "D";
+		} else if (float.class.equals(clazz)){
+			return "F";
+		} else if (char.class.equals(clazz)){
+			return "C";
+		} else if (boolean.class.equals(clazz)){
+			return "Z";
+		} else if (void.class.equals(clazz)){
+			return "V";
+		} else {
+			String canonName = clazz.getCanonicalName();
+			if (canonName == null){
+				return null;
+			}
+			while (canonName.contains("]")){
+				canonName = canonName.replaceAll("^(.*?)\\[\\]$", "\\[\\1");
+			}
+			return "L" + canonName.replace('.', '/') + ";";
+		}
+	}
+	
+	/**
+	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
+	 * itself, because they're all FML mods anyway.
+	 * 
+	 * @return the list of registered {ThebombzenAPIBaseMod}.
+	 */
+	public static ThebombzenAPIBaseMod[] getMods() {
+		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
+	}
+	
 	/**
 	 * Get the value of a private field.
 	 * 
@@ -140,48 +184,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass, String name) {
 		return getPrivateField(instance, declaringClass, new String[] { name });
-	}
-	
-	/**
-	 * Turn a {java.util.Collection} of {Integer}s into an array of {int}.
-	 * {java.util.Collection.toArray()} doesn't let you do this.
-	 * 
-	 * @param coll
-	 *            The {java.util.Collection} to convert.
-	 * @return An array of {int}.
-	 */
-	public static int[] intArrayFromIntegerCollection(
-			Collection<? extends Integer> coll) {
-		List<Integer> ret = new ArrayList<Integer>();
-		ret.addAll(coll);
-		return intArrayFromIntegerList(ret);
-	}
-	
-	/**
-	 * Correctly converts an {int[]} to {java.util.List<Integer>}, because
-	 * {java.util.Arrays.asList()} converts it to a {java.util.List<int[]>} with
-	 * one element.
-	 * 
-	 * @param Array
-	 *            of {int}
-	 * @return {java.util.List} of {Integer}
-	 */
-	public static List<Integer> intArrayToIntegerList(int[] array) {
-		List<Integer> ret = new ArrayList<Integer>(array.length);
-		for (int i : array) {
-			ret.add(i);
-		}
-		return ret;
-	}
-
-	/**
-	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
-	 * itself, because they're all FML mods anyway.
-	 * 
-	 * @return the list of registered {ThebombzenAPIBaseMod}.
-	 */
-	public static ThebombzenAPIBaseMod[] getMods() {
-		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
 	}
 
 	/**
@@ -202,7 +204,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			String[] names) {
 		return getPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private static <T, E> T getPrivateField0(E object, Class<? super E> declaringClass, String[] names) {
 		for (String name : names) {
@@ -220,7 +222,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return null;
 	}
-
+	
 	public static InputStream getResourceAsStream(ThebombzenAPIBaseMod mod, String resourceName) throws IOException {
 		File source = FMLCommonHandler.instance().findContainerFor(mod).getSource();
 		if (source.isDirectory()){
@@ -238,6 +240,21 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 
 	/**
+	 * Turn a {java.util.Collection} of {Integer}s into an array of {int}.
+	 * {java.util.Collection.toArray()} doesn't let you do this.
+	 * 
+	 * @param coll
+	 *            The {java.util.Collection} to convert.
+	 * @return An array of {int}.
+	 */
+	public static int[] intArrayFromIntegerCollection(
+			Collection<? extends Integer> coll) {
+		List<Integer> ret = new ArrayList<Integer>();
+		ret.addAll(coll);
+		return intArrayFromIntegerList(ret);
+	}
+
+	/**
 	 * Turn a {java.util.List} of {Integer}s into an array of {int}.
 	 * {java.util.List.toArray()} doesn't let you do this.
 	 * 
@@ -249,6 +266,23 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		int[] ret = new int[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
+		}
+		return ret;
+	}
+
+	/**
+	 * Correctly converts an {int[]} to {java.util.List<Integer>}, because
+	 * {java.util.Arrays.asList()} converts it to a {java.util.List<int[]>} with
+	 * one element.
+	 * 
+	 * @param Array
+	 *            of {int}
+	 * @return {java.util.List} of {Integer}
+	 */
+	public static List<Integer> intArrayToIntegerList(int[] array) {
+		List<Integer> ret = new ArrayList<Integer>(array.length);
+		for (int i : array) {
+			ret.add(i);
 		}
 		return ret;
 	}
@@ -277,7 +311,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return invokePrivateMethod(instance, declaringClass, new String[] { name },
 				parameterTypes, returnType, args);
 	}
-
+	
 	/**
 	 * Invokes a private method, arranged conveniently. This one allows you to
 	 * pass multiple possible method names, useful for bbfuscation.
@@ -316,40 +350,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			newNames[i] = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(internalClassName, names[i], remappedDesc);
 		}
 		return invokePrivateMethod0(instance, declaringClass, names, parameterTypes, args);
-	}
-	
-	private static String getDescriptorName(Class<?> clazz){
-		if (clazz == null){
-			return null;
-		}
-		if (byte.class.equals(clazz)){
-			return "B";
-		} else if (short.class.equals(clazz)){
-			return "S";
-		} else if (int.class.equals(clazz)){
-			return "I";
-		} else if (long.class.equals(clazz)){
-			return "J";
-		} else if (double.class.equals(clazz)){
-			return "D";
-		} else if (float.class.equals(clazz)){
-			return "F";
-		} else if (char.class.equals(clazz)){
-			return "C";
-		} else if (boolean.class.equals(clazz)){
-			return "Z";
-		} else if (void.class.equals(clazz)){
-			return "V";
-		} else {
-			String canonName = clazz.getCanonicalName();
-			if (canonName == null){
-				return null;
-			}
-			while (canonName.contains("]")){
-				canonName = canonName.replaceAll("^(.*?)\\[\\]$", "\\[\\1");
-			}
-			return "L" + canonName.replace('.', '/') + ";";
-		}
 	}
 	
 	
@@ -569,6 +569,11 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 
 	@Override
+	public String getDownloadLocationURLString() {
+		return "http://is.gd/ThebombzensMods#ThebombzenAPI";
+	}
+
+	@Override
 	public String getLongName() {
 		return "ThebombzenAPI";
 	}
@@ -592,7 +597,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	protected String getToggleMessageString(int index, boolean enabled) {
 		throw new UnsupportedOperationException("ThebombzenAPI has no toggles!");
 	}
-
+	
 	@Override
 	protected String getVersionFileURLString() {
 		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
@@ -609,20 +614,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 					mod.writeToCorrectMemoryFile();
 				}
 			}
-		}
-	}
-	
-	/**
-	 * FML preInitMethod. Does preInit stuff.
-	 * 
-	 * @param event
-	 */
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		initialize();
-		FMLCommonHandler.instance().bus().register(this);
-		for (ThebombzenAPIBaseMod mod : mods){
-			mod.init1(event);
 		}
 	}
 
@@ -655,9 +646,18 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 	}
 	
-	@Override
-	public String getDownloadLocationURLString() {
-		return "http://is.gd/ThebombzensMods#ThebombzenAPI";
+	/**
+	 * FML preInitMethod. Does preInit stuff.
+	 * 
+	 * @param event
+	 */
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		initialize();
+		FMLCommonHandler.instance().bus().register(this);
+		for (ThebombzenAPIBaseMod mod : mods){
+			mod.init1(event);
+		}
 	}
 
 }

@@ -89,6 +89,20 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 	}
 	
+	@Override
+	public int compareTo(ThebombzenAPIBaseMod mod){
+		if (this == mod){
+			return 0;
+		}
+		if (this instanceof ThebombzenAPI){
+			return -1;
+		}
+		if (mod instanceof ThebombzenAPI){
+			return 1;
+		}
+		return this.getLongName().compareTo(mod.getLongName());
+	}
+
 	/**
 	 * This finalizer closes the debug logger upon a crash or other closure.
 	 */
@@ -195,6 +209,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 	}
 
+	public abstract String getDownloadLocationURLString();
+
 	/**
 	 * Fetches the latest version of the mod a file on the interwebs.
 	 * 
@@ -287,6 +303,27 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	protected abstract String getVersionFileURLString();
 
 	/**
+	 * FML preInit method. Does preInit stuff.
+	 */
+	public void init1(FMLPreInitializationEvent event) {
+		
+	}
+
+	/**
+	 * FML load method. Does load stuff.
+	 */
+	public void init2(FMLInitializationEvent event) {
+		
+	}
+
+	/**
+	 * FML postInit method. Does postInit stuff.
+	 */
+	public void init3(FMLPostInitializationEvent event) {
+
+	}
+
+	/**
 	 * This is the init routine. It is separate from the constructor because
 	 * it crashes if this mod is in fact ThebombzenAPI.
 	 * It should only be called independently by ThebombzenAPI itself.
@@ -352,7 +389,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		return toggles[index];
 	}
-
+	
+	
 	/**
 	 * Load memory data from the correct memory file.
 	 */
@@ -364,7 +402,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			saveCompoundToCurrentData(data);
 		}
 	}
-
+	
 	/**
 	 * Read and return memory data from the specified file.
 	 * config
@@ -464,28 +502,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 
 	}
-	
-	
-	/**
-	 * FML preInit method. Does preInit stuff.
-	 */
-	public void init1(FMLPreInitializationEvent event) {
-		
-	}
-	
-	/**
-	 * FML load method. Does load stuff.
-	 */
-	public void init2(FMLInitializationEvent event) {
-		
-	}
-
-	/**
-	 * FML postInit method. Does postInit stuff.
-	 */
-	public void init3(FMLPostInitializationEvent event) {
-
-	}
 
 	/**
 	 * Sets the keycode used to change the toggle.
@@ -529,7 +545,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			throw new RuntimeException(info, exception);
 		}
 	}
-
+	
 	/**
 	 * Writes the current data to the correct data memory file.
 	 */
@@ -541,7 +557,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			writeToMemoryFile(file, data);
 		}
 	}
-
+	
 	/**
 	 * Writes the given memory data compound to the given file.
 	 * 
@@ -561,21 +577,5 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			throwException("Couldn't write to memory file.", ioe, false);
 		}
 	}
-	
-	@Override
-	public int compareTo(ThebombzenAPIBaseMod mod){
-		if (this == mod){
-			return 0;
-		}
-		if (this instanceof ThebombzenAPI){
-			return -1;
-		}
-		if (mod instanceof ThebombzenAPI){
-			return 1;
-		}
-		return this.getLongName().compareTo(mod.getLongName());
-	}
-	
-	public abstract String getDownloadLocationURLString();
 	
 }

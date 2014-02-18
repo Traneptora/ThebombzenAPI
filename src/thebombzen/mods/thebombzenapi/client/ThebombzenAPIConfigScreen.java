@@ -76,24 +76,6 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	}
 
 	/**
-	 * Draw the screen like the options screen, and the applicable tooltips.
-	 */
-	@Override
-	public void drawScreen(int i, int j, float f) {
-		// func_146276_q_ == drawDefaultBackground()
-		this.drawDefaultBackground();
-		// field_146289_q == fontRenderer
-		// field_146294_l == width
-		this.drawCenteredString(fontRendererObj, title, width / 2, 10,
-				16777215);
-		super.drawScreen(i, j, f);
-		// field_146297_k == mc
-		for (ThebombzenAPIConfigGuiButton button : tooltipButtons.keySet()) {
-			button.drawTooltip(mc, i, j);
-		}
-	}
-
-	/**
 	 * Perform an action upon mouse click.
 	 * Formerly actionPerformed
 	 * @param button
@@ -131,6 +113,24 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 					currentKeyButton = button;
 				}
 			}
+		}
+	}
+
+	/**
+	 * Draw the screen like the options screen, and the applicable tooltips.
+	 */
+	@Override
+	public void drawScreen(int i, int j, float f) {
+		// func_146276_q_ == drawDefaultBackground()
+		this.drawDefaultBackground();
+		// field_146289_q == fontRenderer
+		// field_146294_l == width
+		this.drawCenteredString(fontRendererObj, title, width / 2, 10,
+				16777215);
+		super.drawScreen(i, j, f);
+		// field_146297_k == mc
+		for (ThebombzenAPIConfigGuiButton button : tooltipButtons.keySet()) {
+			button.drawTooltip(mc, i, j);
 		}
 	}
 
