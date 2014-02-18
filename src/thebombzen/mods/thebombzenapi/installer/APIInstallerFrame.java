@@ -222,6 +222,7 @@ public class APIInstallerFrame extends JFrame {
 		});
 		
 		browseButton.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent ae) {
 				JFileChooser jfc = new JFileChooser();
 				jfc.setMultiSelectionEnabled(false);
