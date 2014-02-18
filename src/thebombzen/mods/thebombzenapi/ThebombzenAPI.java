@@ -26,7 +26,9 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -136,8 +138,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            The field name.
 	 * @return The value of the field.
 	 */
-	public static <T> T getPrivateField(Object arg, Class<?> clazz, String name) {
-		return getPrivateField(arg, clazz, new String[] { name });
+	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass, String name) {
+		return getPrivateField(instance, declaringClass, new String[] { name });
 	}
 	
 	/**
@@ -186,9 +188,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * Get the value of a private field. This one allows you to pass multiple
 	 * field names (useful for obfuscation).
 	 * 
-	 * @param arg
+	 * @param instance
 	 *            The object whose field we're retrieving.
-	 * @param clazz
+	 * @param declaringClass
 	 *            The declaring class of the private field. Use a class literal
 	 *            and not getClass(). This might be a superclass of the class of
 	 *            the object.
@@ -196,15 +198,19 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            The multiple field names of the field to retrieve.
 	 * @return The value of the field.
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getPrivateField(Object arg, Class<?> clazz,
+	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass,
 			String[] names) {
+		return getPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static <T, E> T getPrivateField0(E object, Class<? super E> declaringClass, String[] names) {
 		for (String name : names) {
 			try {
-				Field field = clazz.getDeclaredField(name);
+				Field field = declaringClass.getDeclaredField(name);
 				field.setAccessible(true);
 				try {
-					return (T) field.get(arg);
+					return (T) field.get(object);
 				} catch (Exception e) {
 					return null;
 				}
@@ -215,11 +221,16 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return null;
 	}
 
-	public static InputStream getResourceAsStream(Object mod, String resourceName) throws IOException {
+	public static InputStream getResourceAsStream(ThebombzenAPIBaseMod mod, String resourceName) throws IOException {
 		File source = FMLCommonHandler.instance().findContainerFor(mod).getSource();
 		if (source.isDirectory()){
 			return new FileInputStream(new File(source, resourceName));
 		} else {
+			try {
+				jarFile.close();
+			} catch (Exception e){
+				
+			}
 			jarFile = new JarFile(source);
 			JarEntry entry = jarFile.getJarEntry(resourceName);
 			return jarFile.getInputStream(entry);
@@ -245,9 +256,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Invokes a private method, arranged conveniently. Tip: Use class literals.
 	 * 
-	 * @param arg
+	 * @param instance
 	 *            This is the object whose method we're invoking.
-	 * @param clazz
+	 * @param declaringClass
 	 *            This is the declaring class of the method we want. Use a class
 	 *            literal and not getClass(). This argument is necessary because
 	 *            {Class.getMethods()} only returns public methods, and
@@ -261,19 +272,19 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            The arguments we want to pass to the method.
 	 * @return Whatever the method returns.
 	 */
-	public static <T> T invokePrivateMethod(Object arg, Class<?> clazz,
-			String name, Class<?>[] parameterTypes, Object... args) {
-		return invokePrivateMethod(arg, clazz, new String[] { name },
-				parameterTypes, args);
+	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass,
+			String name, Class<?>[] parameterTypes, Class<?> returnType, Object... args) {
+		return invokePrivateMethod(instance, declaringClass, new String[] { name },
+				parameterTypes, returnType, args);
 	}
 
 	/**
 	 * Invokes a private method, arranged conveniently. This one allows you to
 	 * pass multiple possible method names, useful for bbfuscation.
 	 * 
-	 * @param arg
+	 * @param instance
 	 *            This is the object whose method we're invoking.
-	 * @param clazz
+	 * @param declaringClass
 	 *            This is the declaring class of the method we want. Use a class
 	 *            literal and not getClass(). This argument is necessary because
 	 *            {Class.getMethods()} only returns public methods, and
@@ -288,15 +299,69 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            The arguments we want to pass to the method.
 	 * @return Whatever the method returns.
 	 */
+	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass, String[] names, Class<?>[] parameterTypes, Class<?> returnType, Object... args){
+		String internalClassName = declaringClass.getCanonicalName().replace('.', '/');
+		StringBuilder descBuilder = new StringBuilder().append('(');
+		
+		for (Class<?> clazz : parameterTypes){
+			descBuilder.append(getDescriptorName(clazz));
+		}
+		descBuilder.append(')').append(getDescriptorName(returnType));
+		
+		String desc = descBuilder.toString();
+		String remappedDesc = FMLDeobfuscatingRemapper.INSTANCE.mapMethodDesc(desc);
+		
+		String[] newNames = new String[names.length];
+		for (int i = 0; i < names.length; i++){
+			newNames[i] = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(internalClassName, names[i], remappedDesc);
+		}
+		return invokePrivateMethod0(instance, declaringClass, names, parameterTypes, args);
+	}
+	
+	private static String getDescriptorName(Class<?> clazz){
+		if (clazz == null){
+			return null;
+		}
+		if (byte.class.equals(clazz)){
+			return "B";
+		} else if (short.class.equals(clazz)){
+			return "S";
+		} else if (int.class.equals(clazz)){
+			return "I";
+		} else if (long.class.equals(clazz)){
+			return "J";
+		} else if (double.class.equals(clazz)){
+			return "D";
+		} else if (float.class.equals(clazz)){
+			return "F";
+		} else if (char.class.equals(clazz)){
+			return "C";
+		} else if (boolean.class.equals(clazz)){
+			return "Z";
+		} else if (void.class.equals(clazz)){
+			return "V";
+		} else {
+			String canonName = clazz.getCanonicalName();
+			if (canonName == null){
+				return null;
+			}
+			while (canonName.contains("]")){
+				canonName = canonName.replaceAll("^(.*?)\\[\\]$", "\\[\\1");
+			}
+			return "L" + canonName.replace('.', '/') + ";";
+		}
+	}
+	
+	
 	@SuppressWarnings("unchecked")
-	public static <T> T invokePrivateMethod(Object arg, Class<?> clazz,
+	private static <T, E> T invokePrivateMethod0(E instance, Class<? super E> declaringClass,
 			String[] names, Class<?>[] parameterTypes, Object... args) {
 		for (String name : names) {
 			try {
-				Method method = clazz.getDeclaredMethod(name, parameterTypes);
+				Method method = declaringClass.getDeclaredMethod(name, parameterTypes);
 				method.setAccessible(true);
 				try {
-					return (T) method.invoke(arg, args);
+					return (T) method.invoke(instance, args);
 				} catch (Exception e) {
 					return null;
 				}
@@ -393,11 +458,15 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param set
 	 *            The value we're assigning to the field.
 	 */
-	public static void setPrivateField(Object arg, Class<?> clazz, String name,
+	public static <E> void setPrivateField(E instance, Class<? super E> clazz, String name,
 			Object set) {
-		setPrivateField(arg, clazz, new String[] { name }, set);
+		setPrivateField(instance, clazz, new String[] { name }, set);
 	}
 
+	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, String[] names, Object set){
+		setPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names), set);
+	}
+	
 	/**
 	 * Set the value of a private field. This one allows you to pass multiple
 	 * field names (useful for obfuscation).
@@ -413,21 +482,23 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param set
 	 *            The value we're assigning to the field.
 	 */
-	public static void setPrivateField(Object arg, Class<?> clazz,
+	private static <E> void setPrivateField0(E instance, Class<? super E> declaringClass,
 			String[] names, Object set) {
 		for (String name : names) {
 			try {
-				Field field = clazz.getDeclaredField(name);
+				Field field = declaringClass.getDeclaredField(name);
 				field.setAccessible(true);
 				try {
-					field.set(arg, set);
-				} catch (Exception e) {
+					field.set(instance, set);
 					return;
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
 			} catch (NoSuchFieldException nsfe) {
 				continue;
 			}
 		}
+		throw new RuntimeException("Field not found!");
 	}
 
 	private ThebombzenAPIMetaConfiguration dummyConfig = null;
