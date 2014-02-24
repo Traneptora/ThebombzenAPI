@@ -182,7 +182,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	/**
 	 * Gets the configuration for this mod.
 	 */
-	public abstract ThebombzenAPIConfiguration<?> getConfiguration();
+	public abstract <T extends ThebombzenAPIConfiguration<?>> T getConfiguration();
 
 	/**
 	 * This returns the location of the data compound memory file.

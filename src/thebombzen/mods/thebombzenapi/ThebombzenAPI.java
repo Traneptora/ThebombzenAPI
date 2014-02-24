@@ -463,10 +463,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		setPrivateField(instance, clazz, new String[] { name }, set);
 	}
 
-	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, String[] names, Object set){
-		setPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names), set);
-	}
-	
 	/**
 	 * Set the value of a private field. This one allows you to pass multiple
 	 * field names (useful for obfuscation).
@@ -482,6 +478,10 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param set
 	 *            The value we're assigning to the field.
 	 */
+	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, String[] names, Object set){
+		setPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names), set);
+	}
+	
 	private static <E> void setPrivateField0(E instance, Class<? super E> declaringClass,
 			String[] names, Object set) {
 		for (String name : names) {
@@ -560,8 +560,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		jarFile.close();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ThebombzenAPIConfiguration<?> getConfiguration() {
+	public ThebombzenAPIMetaConfiguration getConfiguration() {
 		if (dummyConfig == null){
 			dummyConfig = new ThebombzenAPIMetaConfiguration();
 		}
@@ -628,7 +629,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			try {
 				mod.getConfiguration().load();
 			} catch (IOException ioe) {
-				throwException("Unable to open configuration!", ioe, true);
+				mod.throwException("Unable to open configuration!", ioe, true);
 			}
 			mod.init2(event);
 		}
