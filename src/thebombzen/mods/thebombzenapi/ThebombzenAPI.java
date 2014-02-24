@@ -1,19 +1,17 @@
 package thebombzen.mods.thebombzenapi;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -26,9 +24,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -44,7 +40,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.4")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.5")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -82,8 +78,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@SideOnly(Side.CLIENT)
 	public static int prevWorld;
-	
-	private static JarFile jarFile = null;
 
 	/**
 	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
@@ -125,9 +119,13 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return true;
 	}
-	private static String getDescriptorName(Class<?> clazz){
+	
+	/*private static String getDescriptorName(Class<?> clazz){
 		if (clazz == null){
 			return null;
+		}
+		if (clazz.isArray()){
+			return "[" + getDescriptorName(clazz.getComponentType());
 		}
 		if (byte.class.equals(clazz)){
 			return "B";
@@ -152,18 +150,15 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			if (canonName == null){
 				return null;
 			}
-			while (canonName.contains("]")){
-				canonName = canonName.replaceAll("^(.*?)\\[\\]$", "\\[\\1");
-			}
 			return "L" + canonName.replace('.', '/') + ";";
 		}
-	}
+	}*/
 	
 	/**
-	 * Get the set of {ThebombzenAPIBaseMod}. Mostly useful for ThebombzenAPI
+	 * Get the set of ThebombzenAPIBaseMod. Mostly useful for ThebombzenAPI
 	 * itself, because they're all FML mods anyway.
 	 * 
-	 * @return the list of registered {ThebombzenAPIBaseMod}.
+	 * @return the list of registered ThebombzenAPIBaseMod.
 	 */
 	public static ThebombzenAPIBaseMod[] getMods() {
 		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
@@ -202,17 +197,17 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass,
 			String[] names) {
-		return getPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names));
+		return getPrivateField0(instance, declaringClass, names);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T, E> T getPrivateField0(E object, Class<? super E> declaringClass, String[] names) {
+	private static <T, E> T getPrivateField0(E instance, Class<? super E> declaringClass, String[] names) {
 		for (String name : names) {
 			try {
 				Field field = declaringClass.getDeclaredField(name);
 				field.setAccessible(true);
 				try {
-					return (T) field.get(object);
+					return (T) field.get(instance);
 				} catch (Exception e) {
 					return null;
 				}
@@ -225,59 +220,36 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	public static InputStream getResourceAsStream(ThebombzenAPIBaseMod mod, String resourceName) throws IOException {
 		File source = FMLCommonHandler.instance().findContainerFor(mod).getSource();
-		if (source.isDirectory()){
-			return new FileInputStream(new File(source, resourceName));
-		} else {
-			try {
-				jarFile.close();
-			} catch (Exception e){
-				
-			}
-			jarFile = new JarFile(source);
-			JarEntry entry = jarFile.getJarEntry(resourceName);
-			return jarFile.getInputStream(entry);
-		}
+		return new ModResourceInputStream(source, resourceName);
 	}
 
 	/**
-	 * Turn a {java.util.Collection} of {Integer}s into an array of {int}.
-	 * {java.util.Collection.toArray()} doesn't let you do this.
+	 * Turn a Collection of Integers into an array of int.
+	 * java.util.Collection.toArray() doesn't let you do this.
 	 * 
 	 * @param coll
-	 *            The {java.util.Collection} to convert.
-	 * @return An array of {int}.
+	 *            The java.util.Collection to convert.
+	 * @return An array of int.
 	 */
 	public static int[] intArrayFromIntegerCollection(
 			Collection<? extends Integer> coll) {
-		List<Integer> ret = new ArrayList<Integer>();
-		ret.addAll(coll);
-		return intArrayFromIntegerList(ret);
-	}
-
-	/**
-	 * Turn a {java.util.List} of {Integer}s into an array of {int}.
-	 * {java.util.List.toArray()} doesn't let you do this.
-	 * 
-	 * @param list
-	 *            The {java.util.List} to convert.
-	 * @return An array of {int}.
-	 */
-	public static int[] intArrayFromIntegerList(List<? extends Integer> list) {
-		int[] ret = new int[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			ret[i] = list.get(i);
+		int[] ret = new int[coll.size()];
+		int i = 0;
+		Iterator<? extends Integer> iter = coll.iterator();
+		while (iter.hasNext()){
+			ret[i++] = iter.next();
 		}
 		return ret;
 	}
 
 	/**
-	 * Correctly converts an {int[]} to {java.util.List<Integer>}, because
-	 * {java.util.Arrays.asList()} converts it to a {java.util.List<int[]>} with
+	 * Correctly converts an int[] to java.util.List<Integer>, because
+	 * java.util.Arrays.asList() converts it to a java.util.List<int[]> with
 	 * one element.
 	 * 
 	 * @param Array
-	 *            of {int}
-	 * @return {java.util.List} of {Integer}
+	 *            of int
+	 * @return java.util.List of Integer
 	 */
 	public static List<Integer> intArrayToIntegerList(int[] array) {
 		List<Integer> ret = new ArrayList<Integer>(array.length);
@@ -295,8 +267,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param declaringClass
 	 *            This is the declaring class of the method we want. Use a class
 	 *            literal and not getClass(). This argument is necessary because
-	 *            {Class.getMethods()} only returns public methods, and
-	 *            {Class.getDeclaredMethods()} requires the declaring class.
+	 *            Class.getMethods() only returns public methods, and
+	 *            Class.getDeclaredMethods() requires the declaring class.
 	 * @param name
 	 *            The name of the method we want to invoke
 	 * @param parameterTypes
@@ -314,7 +286,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	/**
 	 * Invokes a private method, arranged conveniently. This one allows you to
-	 * pass multiple possible method names, useful for bbfuscation.
+	 * pass multiple possible method names, useful for obfuscation.
 	 * 
 	 * @param instance
 	 *            This is the object whose method we're invoking.
@@ -334,24 +306,18 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @return Whatever the method returns.
 	 */
 	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass, String[] names, Class<?>[] parameterTypes, Class<?> returnType, Object... args){
-		String internalClassName = declaringClass.getCanonicalName().replace('.', '/');
-		StringBuilder descBuilder = new StringBuilder().append('(');
-		
-		for (Class<?> clazz : parameterTypes){
-			descBuilder.append(getDescriptorName(clazz));
-		}
-		descBuilder.append(')').append(getDescriptorName(returnType));
-		
-		String desc = descBuilder.toString();
-		String remappedDesc = FMLDeobfuscatingRemapper.INSTANCE.mapMethodDesc(desc);
-		
-		String[] newNames = new String[names.length];
-		for (int i = 0; i < names.length; i++){
-			newNames[i] = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(internalClassName, names[i], remappedDesc);
-		}
 		return invokePrivateMethod0(instance, declaringClass, names, parameterTypes, args);
 	}
 	
+	/*
+	private static String unmapDescriptorName(String name){
+		if (name.startsWith("[")){
+			return "[" + unmapDescriptorName(name.substring(1));
+		}
+		if (name.startsWith("L")){
+			
+		}
+	}*/
 	
 	@SuppressWarnings("unchecked")
 	private static <T, E> T invokePrivateMethod0(E instance, Class<? super E> declaringClass,
@@ -479,7 +445,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            The value we're assigning to the field.
 	 */
 	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, String[] names, Object set){
-		setPrivateField0(instance, declaringClass, ObfuscationReflectionHelper.remapFieldNames(declaringClass.getCanonicalName(), names), set);
+		setPrivateField0(instance, declaringClass, names, set);
 	}
 	
 	private static <E> void setPrivateField0(E instance, Class<? super E> declaringClass,
@@ -554,18 +520,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		prevWorld = currWorld;
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		jarFile.close();
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public ThebombzenAPIMetaConfiguration getConfiguration() {
-		if (dummyConfig == null){
-			dummyConfig = new ThebombzenAPIMetaConfiguration();
-		}
 		return dummyConfig;
 	}
 
@@ -581,7 +538,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.3.4, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.3.5, Minecraft 1.7.2";
 	}
 
 	@Override
@@ -619,7 +576,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 
 	/**
-	 * FML load method. Does load stuff.
+	 * FML load method. Does load stuff and calls init2 of the mods.
 	 * 
 	 * @param event
 	 */
@@ -636,7 +593,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 
 	/**
-	 * FML postInit method. Does postInit stuff.
+	 * FML postInit method. Does postInit stuff and calls init3 of the mods.
 	 * 
 	 * @param event
 	 */
@@ -648,7 +605,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 	
 	/**
-	 * FML preInitMethod. Does preInit stuff.
+	 * FML preInitMethod. Does preInit stuff and calls init1 of the mods.
 	 * 
 	 * @param event
 	 */
@@ -656,6 +613,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public void preInit(FMLPreInitializationEvent event) {
 		initialize();
 		FMLCommonHandler.instance().bus().register(this);
+		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
+		dummyConfig = new ThebombzenAPIMetaConfiguration();
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.init1(event);
 		}

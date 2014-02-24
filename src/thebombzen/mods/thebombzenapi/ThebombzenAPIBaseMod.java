@@ -286,7 +286,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	protected abstract String getToggleMessageString(int index, boolean enabled);
 
 	/**
-	 * Returns a {java.net.URL} pointing toward the current version file.
+	 * Returns a java.net.URL pointing toward the current version file.
 	 */
 	public URL getVersionFileURL() {
 		try {
@@ -297,27 +297,27 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Returns a {String} containing a URL pointing toward the current version
+	 * Returns a String containing a URL pointing toward the current version
 	 * file.
 	 */
 	protected abstract String getVersionFileURLString();
 
 	/**
-	 * FML preInit method. Does preInit stuff.
+	 * Equivalent of preInit.
 	 */
 	public void init1(FMLPreInitializationEvent event) {
 		
 	}
 
 	/**
-	 * FML load method. Does load stuff.
+	 * Equivalent of load.
 	 */
 	public void init2(FMLInitializationEvent event) {
 		
 	}
 
 	/**
-	 * FML postInit method. Does postInit stuff.
+	 * Equivalent of postInit.
 	 */
 	public void init3(FMLPostInitializationEvent event) {
 
@@ -327,7 +327,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * This is the init routine. It is separate from the constructor because
 	 * it crashes if this mod is in fact ThebombzenAPI.
 	 * It should only be called independently by ThebombzenAPI itself.
-	 * YOU HAVE TO LOAD YOUR CONFIGURATION YOURSELF IN postInit!
 	 */
 	void initialize(){
 		

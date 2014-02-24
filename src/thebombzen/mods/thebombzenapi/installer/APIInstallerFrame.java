@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 public class APIInstallerFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
+	
 	public static void copyFile(File sourceFile, File destFile) throws IOException {
 		
 	    if(!destFile.exists()) {
