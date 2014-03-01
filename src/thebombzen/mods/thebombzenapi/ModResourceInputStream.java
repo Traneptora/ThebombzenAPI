@@ -9,7 +9,7 @@ import java.util.zip.ZipFile;
 
 public class ModResourceInputStream extends FilterInputStream {
 	
-	private final ZipFile zipFile;
+	private ZipFile zipFile;
 	
 	public ModResourceInputStream(File location, String resource) throws IOException {
 		super(null);

@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
-	 * Platform dependent newline. Microsoft thinks it's so cool with its
+	 * Platform-dependent newline. Microsoft thinks it's so cool with its
 	 * carriage returns. It's not. Real operating systems don't use carriage
 	 * returns before every line feed. (Except when returning a carriage.)
 	 */

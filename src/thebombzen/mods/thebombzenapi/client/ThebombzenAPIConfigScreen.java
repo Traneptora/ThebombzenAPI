@@ -165,7 +165,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 			// field_146294_l == width
 			// field_146295_m == height
 			ThebombzenAPIConfigGuiButton button = new ThebombzenAPIConfigGuiButton(
-					this, 4913 + i, width / 2 - 206 + (i % 2) * 207,
+					this, 4913 + i, width / 2 - 206 + (i & 1) * 207,
 					height / 6 + 23 * (i >> 1) - 18, 205, 20,
 					getDisplayGuiString(option), option.getInfo());
 			i++;
