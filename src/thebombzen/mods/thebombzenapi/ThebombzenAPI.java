@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.3.5")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0pre2")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -48,7 +48,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * carriage returns. It's not. Real operating systems don't use carriage
 	 * returns before every line feed. (Except when returning a carriage.)
 	 */
-	public static final String newLine = String.format("%n");
+	public static final String NEWLINE = String.format("%n");
 
 	/**
 	 * The mod instance
@@ -67,20 +67,25 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * register itself because it's easier for me than that fancy classpath
 	 * probing schtuff.
 	 */
-	private static SortedSet<ThebombzenAPIBaseMod> mods = new TreeSet<ThebombzenAPIBaseMod>();
+	private static Set<ThebombzenAPIBaseMod> mods = new TreeSet<ThebombzenAPIBaseMod>();
 	
 	/**
-	 * This is the {System.identityHashCode} of the previous client-side world,
+	 * This is the System.identityHashCode of the previous client-side world,
 	 * used to detect when a new world has opened. By storing the
-	 * {System.identityHashCode} rather than the {net.minecraft.world.World} we
+	 * System.identityHashCode() rather than the World we
 	 * don't have to worry about garbage collection issues, but we can still
 	 * detect a world change.
 	 */
 	@SideOnly(Side.CLIENT)
 	public static int prevWorld;
+	
+	public static final String[] singleMultiStrings = new String[]{"Never", "Singleplayer Only", "Multiplayer Only", "Always"};
+	
+	private static MetaConfiguration dummyConfig = null;
+	//private static Map<ThebombzenAPIBaseMod, Map<Integer, Boolean>> keysPreviouslyDown = new HashMap<ThebombzenAPIBaseMod, Map<Integer, Boolean>>(); 
 
 	/**
-	 * Detects whether two collections of {net.minecraft.item.ItemStack} contain
+	 * Detects whether two collections of ItemStack contain
 	 * the same items. It depends on multiplicity, but doesn't depend on order.
 	 * Note that it will return false if comparing 2 Dirt + 2 Dirt to 1 Dirt + 3
 	 * Dirt.
@@ -95,6 +100,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public static boolean areItemStackCollectionsEqual(
 			Collection<? extends ItemStack> coll1,
 			Collection<? extends ItemStack> coll2) {
+		
 		if (coll1.size() != coll2.size()) {
 			return false;
 		}
@@ -120,65 +126,18 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return true;
 	}
 	
-	/*private static String getDescriptorName(Class<?> clazz){
-		if (clazz == null){
-			return null;
-		}
-		if (clazz.isArray()){
-			return "[" + getDescriptorName(clazz.getComponentType());
-		}
-		if (byte.class.equals(clazz)){
-			return "B";
-		} else if (short.class.equals(clazz)){
-			return "S";
-		} else if (int.class.equals(clazz)){
-			return "I";
-		} else if (long.class.equals(clazz)){
-			return "J";
-		} else if (double.class.equals(clazz)){
-			return "D";
-		} else if (float.class.equals(clazz)){
-			return "F";
-		} else if (char.class.equals(clazz)){
-			return "C";
-		} else if (boolean.class.equals(clazz)){
-			return "Z";
-		} else if (void.class.equals(clazz)){
-			return "V";
-		} else {
-			String canonName = clazz.getCanonicalName();
-			if (canonName == null){
-				return null;
-			}
-			return "L" + canonName.replace('.', '/') + ";";
-		}
-	}*/
+	public static int countOccurrences(String s, char c){
+		return s.length() - s.replace(Character.toString(c), "").length();
+	}
 	
 	/**
-	 * Get the set of ThebombzenAPIBaseMod. Mostly useful for ThebombzenAPI
+	 * Get the set of ThebombzenAPIBaseMods. Mostly useful for ThebombzenAPI
 	 * itself, because they're all FML mods anyway.
 	 * 
 	 * @return the list of registered ThebombzenAPIBaseMod.
 	 */
 	public static ThebombzenAPIBaseMod[] getMods() {
 		return mods.toArray(new ThebombzenAPIBaseMod[mods.size()]);
-	}
-	
-	/**
-	 * Get the value of a private field.
-	 * 
-	 * @param arg
-	 *            The object whose field we're retrieving.
-	 * @param clazz
-	 *            The declaring class of the private field. Use a class literal
-	 *            and not getClass(). This might be a superclass of the class of
-	 *            the object.
-	 * @param name
-	 *            The field name.
-	 * @return The value of the field.
-	 */
-	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass, String name) {
-		return getPrivateField(instance, declaringClass, new String[] { name });
 	}
 
 	/**
@@ -194,14 +153,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param name
 	 *            The multiple field names of the field to retrieve.
 	 * @return The value of the field.
+	 * @throws SecurityException If a security Error occurred
+	 * @throws FieldNotFoundException If some other error occurred
 	 */
-	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass,
-			String[] names) {
-		return getPrivateField0(instance, declaringClass, names);
-	}
-
 	@SuppressWarnings("unchecked")
-	private static <T, E> T getPrivateField0(E instance, Class<? super E> declaringClass, String[] names) {
+	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass,
+			String... names) throws FieldNotFoundException {
 		for (String name : names) {
 			try {
 				Field field = declaringClass.getDeclaredField(name);
@@ -209,27 +166,46 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 				try {
 					return (T) field.get(instance);
 				} catch (Exception e) {
-					return null;
+					throw new FieldNotFoundException("Cannot get value of field", e);
 				}
 			} catch (NoSuchFieldException nsfe) {
 				continue;
 			}
 		}
-		return null;
+		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
 	
+	/**
+	 * Get an InputStream reading a mod reasource. Gets the stream from the jar file if it's a jar file or filesystem if it's a directory.
+	 * @param mod The mod
+	 * @param resourceName The name of the resource
+	 * @return A self-contained InputStream reading the resource.
+	 * @throws IOException If an I/O error orccurs.
+	 */
 	public static InputStream getResourceAsStream(ThebombzenAPIBaseMod mod, String resourceName) throws IOException {
 		File source = FMLCommonHandler.instance().findContainerFor(mod).getSource();
 		return new ModResourceInputStream(source, resourceName);
 	}
 
 	/**
+	 * Checks to see if the current world is a freshly loaded world.
+	 */
+	@SideOnly(Side.CLIENT)
+	public static boolean hasWorldChanged(){
+		if (Minecraft.getMinecraft().theWorld == null){
+			return false;
+		}
+		int currWorld = System.identityHashCode(Minecraft.getMinecraft().theWorld);
+		return currWorld != prevWorld;
+	}
+
+	/**
 	 * Turn a Collection of Integers into an array of int.
-	 * java.util.Collection.toArray() doesn't let you do this.
+	 * Collection.toArray() doesn't let you do this.
 	 * 
 	 * @param coll
-	 *            The java.util.Collection to convert.
-	 * @return An array of int.
+	 *            The Collection to convert.
+	 * @return Some int[]
 	 */
 	public static int[] intArrayFromIntegerCollection(
 			Collection<? extends Integer> coll) {
@@ -244,12 +220,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
 	 * Correctly converts an int[] to java.util.List<Integer>, because
-	 * java.util.Arrays.asList() converts it to a java.util.List<int[]> with
+	 * Arrays.asList() converts it to a java.util.List<int[]> with
 	 * one element.
 	 * 
 	 * @param Array
 	 *            of int
-	 * @return java.util.List of Integer
+	 * @return The List<Integer> containing the ints.
 	 */
 	public static List<Integer> intArrayToIntegerList(int[] array) {
 		List<Integer> ret = new ArrayList<Integer>(array.length);
@@ -258,7 +234,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return ret;
 	}
-
+	
 	/**
 	 * Invokes a private method, arranged conveniently. Tip: Use class literals.
 	 * 
@@ -276,12 +252,14 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            overloading).
 	 * @param args
 	 *            The arguments we want to pass to the method.
-	 * @return Whatever the method returns.
+	 * @return Whatever the method returns
+	 * @throws SecurityException if a security error occurs
+	 * @throws MethodNotFoundException if another error occurs
 	 */
 	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass,
-			String name, Class<?>[] parameterTypes, Class<?> returnType, Object... args) {
+			String name, Class<?>[] parameterTypes, Object... args) throws MethodNotFoundException {
 		return invokePrivateMethod(instance, declaringClass, new String[] { name },
-				parameterTypes, returnType, args);
+				parameterTypes, args);
 	}
 	
 	/**
@@ -293,8 +271,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param declaringClass
 	 *            This is the declaring class of the method we want. Use a class
 	 *            literal and not getClass(). This argument is necessary because
-	 *            {Class.getMethods()} only returns public methods, and
-	 *            {Class.getDeclaredMethods()} requires the declaring class.
+	 *            Class.getMethods() only returns public methods, and
+	 *            Class.getDeclaredMethods() requires the declaring class.
 	 * @param names
 	 *            The multiple possible method names of the method we want to
 	 *            invoke
@@ -303,39 +281,27 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            overloading).
 	 * @param args
 	 *            The arguments we want to pass to the method.
-	 * @return Whatever the method returns.
+	 * @return Whatever the invoked method returns
+	 * @throws SecurityException if a security error occurs
+	 * @throws MethodNotFoundException if another error occurs
 	 */
-	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass, String[] names, Class<?>[] parameterTypes, Class<?> returnType, Object... args){
-		return invokePrivateMethod0(instance, declaringClass, names, parameterTypes, args);
-	}
-	
-	/*
-	private static String unmapDescriptorName(String name){
-		if (name.startsWith("[")){
-			return "[" + unmapDescriptorName(name.substring(1));
-		}
-		if (name.startsWith("L")){
-			
-		}
-	}*/
-	
 	@SuppressWarnings("unchecked")
-	private static <T, E> T invokePrivateMethod0(E instance, Class<? super E> declaringClass,
-			String[] names, Class<?>[] parameterTypes, Object... args) {
+	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass, String[] names, Class<?>[] parameterTypes, Object... args) throws MethodNotFoundException {
 		for (String name : names) {
 			try {
 				Method method = declaringClass.getDeclaredMethod(name, parameterTypes);
 				method.setAccessible(true);
 				try {
+					
 					return (T) method.invoke(instance, args);
 				} catch (Exception e) {
-					return null;
+					throw new MethodNotFoundException("Error invoking private method", e);
 				}
 			} catch (NoSuchMethodException nsme) {
 				continue;
 			}
 		}
-		return null;
+		throw new MethodNotFoundException("Cannot find method: " + Arrays.toString(names));
 	}
 
 	/**
@@ -345,7 +311,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param methodName
 	 * @return true if methodName is on the method stack, false otherwise.
 	 */
-	@SideOnly(Side.CLIENT)
 	public static boolean isCurrentlyExecutingMethod(String methodName) {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (StackTraceElement element : trace) {
@@ -355,24 +320,54 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return false;
 	}
+	/**
+	 * Checks to see if the current world is a freshly loaded world and is the first world loaded.
+	 * @return
+	 */
+	@SideOnly(Side.CLIENT)
+	public static boolean isWorldFirstLoadedWorld(){
+		if (Minecraft.getMinecraft().theWorld == null){
+			return false;
+		}
+		return prevWorld == 0;
+	}
+
+	public static boolean parseBoolean(String s){
+		String c = s.toLowerCase().replaceAll("\\s", "");
+		return c.equals("true") || c.equals("yes") || c.equals("on") || c.equals("y");
+	}
 
 	/**
-	 * Parse an integer literal the way java would.
+	 * Parse an integer literal the way java would, but also allow a ~ in front or a - in front.
 	 * That is, a decimal number is parsed as is,
 	 * A number starting with 0 is octal, 0x is hexadecimal, and 0b is binary.
-	 * Negatives will only be parsed if the minus sign comes AFTER the 0x/0b/0.
+	 * Negatives will only be parsed if the - sign comes BEFORE the 0x/0b/0.
 	 * @param The string to parse
 	 * @return The integer value
 	 * @throws NumberFormatException if the number is invalid.
 	 */
-	public static int parseInteger(String s){
+	public static int parseInteger(String s) throws NumberFormatException {
 		s = s.replace("_", "");
-		boolean onecomp = s.charAt(0) == '~';
-		if (onecomp){
+		boolean onecomp = false;
+		if (s.charAt(0) == '~'){
+			onecomp = true;
 			s = s.substring(1);
 		}
+		boolean negative;
+		if (s.charAt(0) == '-'){
+			negative = true;
+			s = s.substring(1);
+		} else {
+			negative = false;
+			if (s.charAt(0) == '+'){
+				s = s.substring(1);
+			}
+		}
 		if (s.length() == 0){
-			throw new NumberFormatException();
+			throw new NumberFormatException("Too short!");
+		}
+		if (s.contains("-") || s.contains("+")){
+			throw new NumberFormatException("Should not contain + or -!");
 		}
 		int i;
 		if (s.charAt(0) != '0'){
@@ -392,6 +387,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			i = Integer.parseInt(s, 8);
 			break;
 		}
+		if (negative){
+			i = -i;
+		}
 		if (onecomp){
 			i = ~i;
 		}
@@ -408,27 +406,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static void registerMod(ThebombzenAPIBaseMod mod) {
 		mods.add(mod);
+		//keysPreviouslyDown.put(mod, new HashMap<Integer, Boolean>());
+		//for (int i = 0; i < mod.getNumToggleKeys(); i++){
+		//	keysPreviouslyDown.get(mod).put(i, false);
+		//}
 	}
-
-	/**
-	 * Set the value of a private field.
-	 * 
-	 * @param arg
-	 *            The object whose field we're setting.
-	 * @param clazz
-	 *            The declaring class of the private field. Use a class literal
-	 *            and not getClass(). This might be a superclass of the class of
-	 *            the object.
-	 * @param name
-	 *            The field name.
-	 * @param set
-	 *            The value we're assigning to the field.
-	 */
-	public static <E> void setPrivateField(E instance, Class<? super E> clazz, String name,
-			Object set) {
-		setPrivateField(instance, clazz, new String[] { name }, set);
-	}
-
+	
 	/**
 	 * Set the value of a private field. This one allows you to pass multiple
 	 * field names (useful for obfuscation).
@@ -439,35 +422,30 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 *            The declaring class of the private field. Use a class literal
 	 *            and not getClass(). This might be a superclass of the class of
 	 *            the object.
+	 * @param value
+	 *            The value we're assigning to the field.
 	 * @param name
 	 *            The field name.
-	 * @param set
-	 *            The value we're assigning to the field.
+	 * @throws SecurityException If a security error occurred
+	 * @throws FieldNotFoundException If some other error occurred
 	 */
-	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, String[] names, Object set){
-		setPrivateField0(instance, declaringClass, names, set);
-	}
-	
-	private static <E> void setPrivateField0(E instance, Class<? super E> declaringClass,
-			String[] names, Object set) {
+	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, Object value, String... names){
 		for (String name : names) {
 			try {
 				Field field = declaringClass.getDeclaredField(name);
 				field.setAccessible(true);
 				try {
-					field.set(instance, set);
+					field.set(instance, value);
 					return;
 				} catch (Exception e) {
-					throw new RuntimeException(e);
+					throw new FieldNotFoundException("Error setting field", e);
 				}
 			} catch (NoSuchFieldException nsfe) {
 				continue;
 			}
 		}
-		throw new RuntimeException("Field not found!");
+		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
-
-	private ThebombzenAPIMetaConfiguration dummyConfig = null;
 	
 	/**
 	 * Main client tick loop.
@@ -479,7 +457,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	@SubscribeEvent
 	public void clientTick(ClientTickEvent tickEvent) {
 
-		if (tickEvent.phase.equals(Phase.END)) {
+		if (!tickEvent.phase.equals(Phase.START)) {
 			return;
 		}
 
@@ -488,22 +466,17 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		if (mc.theWorld == null) {
 			return;
 		}
-
-		int currWorld = System.identityHashCode(mc.theWorld);
-
-		if (prevWorld == 0) {
+		if (isWorldFirstLoadedWorld()) {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				String latestVersion = mod.getLatestVersion();
 				if (!latestVersion.equals(mod.getLongVersionString())) {
-					mc.thePlayer.addChatMessage(new ChatComponentText(
-							latestVersion + " is available. "));
+					mc.thePlayer.addChatMessage(new ChatComponentText(latestVersion + " is available. "));
 					mc.thePlayer.addChatMessage(IChatComponent.Serializer.func_150699_a("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
-					
 				}
 			}
 		}
 
-		if (prevWorld != currWorld) {
+		if (hasWorldChanged()) {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				mod.readFromCorrectMemoryFile();
 			}
@@ -511,18 +484,20 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 		for (ThebombzenAPIBaseMod mod : mods) {
 			try {
-				mod.getConfiguration().reloadPropertiesFromFileIfChanged();
+				boolean did = mod.getConfiguration().reloadPropertiesFromFileIfChanged();
+				if (did){
+					mc.thePlayer.addChatMessage(new ChatComponentText("Reloaded " + mod.getLongName() + " configuration."));
+				}
 			} catch (IOException ioe) {
 				mod.throwException("Could not read properties!", ioe, false);
 			}
 		}
-
-		prevWorld = currWorld;
+		prevWorld = System.identityHashCode(mc.theWorld);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ThebombzenAPIMetaConfiguration getConfiguration() {
+	public MetaConfiguration getConfiguration() {
 		return dummyConfig;
 	}
 
@@ -538,7 +513,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.3.5, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.4.0pre2, Minecraft 1.7.2";
 	}
 
 	@Override
@@ -558,7 +533,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	@Override
 	protected String getVersionFileURLString() {
-		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
+		//return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
+		return "";
 	}
 	
 	@SubscribeEvent
@@ -576,7 +552,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 
 	/**
-	 * FML load method. Does load stuff and calls init2 of the mods.
+	 * FML load method. Does load stuff and calls init2 of the mods. Also loads the configuration of all the mods.
 	 * 
 	 * @param event
 	 */
@@ -605,7 +581,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 	
 	/**
-	 * FML preInitMethod. Does preInit stuff and calls init1 of the mods.
+	 * FML preInitMethod. Does preInit stuff and calls init1 of the mods. Note that in the init1 state the configuration is not loaded.
 	 * 
 	 * @param event
 	 */
@@ -614,7 +590,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		initialize();
 		FMLCommonHandler.instance().bus().register(this);
 		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
-		dummyConfig = new ThebombzenAPIMetaConfiguration();
+		dummyConfig = new MetaConfiguration();
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.init1(event);
 		}

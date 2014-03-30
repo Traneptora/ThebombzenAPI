@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -142,7 +143,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 				prevDebugString = total;
 			}
 		}
-		debugBuilder.append(s).append(ThebombzenAPI.newLine);
+		debugBuilder.append(s).append(ThebombzenAPI.NEWLINE);
 	}
 
 	/**
@@ -182,7 +183,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	/**
 	 * Gets the configuration for this mod.
 	 */
-	public abstract <T extends ThebombzenAPIConfiguration<?>> T getConfiguration();
+	public abstract <T extends ThebombzenAPIConfiguration> T getConfiguration();
 
 	/**
 	 * This returns the location of the data compound memory file.
@@ -286,7 +287,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	protected abstract String getToggleMessageString(int index, boolean enabled);
 
 	/**
-	 * Returns a java.net.URL pointing toward the current version file.
+	 * Returns a URL pointing toward the current version file.
 	 */
 	public URL getVersionFileURL() {
 		try {
@@ -301,9 +302,9 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * file.
 	 */
 	protected abstract String getVersionFileURLString();
-
+	
 	/**
-	 * Equivalent of preInit.
+	 * Equivalent of preInit. The config is not loaded during preInit, careful!
 	 */
 	public void init1(FMLPreInitializationEvent event) {
 		
@@ -388,8 +389,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		return toggles[index];
 	}
-	
-	
+
 	/**
 	 * Load memory data from the correct memory file.
 	 */
@@ -401,6 +401,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			saveCompoundToCurrentData(data);
 		}
 	}
+	
 	
 	/**
 	 * Read and return memory data from the specified file.
@@ -431,7 +432,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		return getCompoundFromCurrentData();
 	}
-
+	
 	/**
 	 * Sae the data compound to the current mod state.
 	 * 
@@ -543,6 +544,11 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		if (fatal) {
 			throw new RuntimeException(info, exception);
 		}
+	}
+
+	@Override
+	public String toString(){
+		return getLongName();
 	}
 	
 	/**

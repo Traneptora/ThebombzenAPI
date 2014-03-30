@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi;
+package thebombzen.mods.thebombzenapi.configuration;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,6 +11,15 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.Properties;
 
+import net.minecraft.client.Minecraft;
+
+import org.lwjgl.input.Keyboard;
+
+import thebombzen.mods.thebombzenapi.ThebombzenAPI;
+import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 /**
  * This class represents a configuration for a mod.
  * 
@@ -18,18 +27,12 @@ import java.util.Properties;
  * @param <T>
  *            This must be a ThebombzenAPIConfigOption and an Enum.
  */
-public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigOption> {
+public abstract class ThebombzenAPIConfiguration {
 
 	/**
 	 * The mod this option is for.
 	 */
 	protected ThebombzenAPIBaseMod mod;
-
-	/**
-	 * This Class opject represents the type of the option. This is necessary
-	 * because of type erasure.
-	 */
-	protected Class<T> optionClass;
 
 	/**
 	 * Basic properties. Advanced config files should be mod-specific.
@@ -59,47 +62,39 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 	 *            The type object of the option class we're using. Necessary due
 	 *            to type erasure.
 	 */
-	public ThebombzenAPIConfiguration(ThebombzenAPIBaseMod baseMod,
-			Class<T> optionClass) {
+	public ThebombzenAPIConfiguration(ThebombzenAPIBaseMod baseMod) {
 		mod = baseMod;
-		this.optionClass = optionClass;
 		propsFile = new File(ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory().getPath() + File.separator + "config" + File.separator + mod.getLongName() + ".txt");
 	}
 
 	/**
 	 * Returns an array of options permitted by this configuration.
 	 */
-	public ThebombzenAPIConfigOption[] getAllOptions() {
-		return optionClass.getEnumConstants();
-	}
+	public abstract ConfigOption[] getAllOptions();
 
 	/**
-	 * Returns the {String} value of the property associated with this
-	 * configuration.
-	 * 
-	 * @param option
-	 *            The config option we're trying to retrieve.
-	 * @return A {String} containing the property value (too bad it's low in
-	 *         this recession), or an empty string if the property was not
-	 *         found.
-	 */
-	public String getProperty(ThebombzenAPIConfigOption option) {
-		String value = properties.getProperty(option.toString());
-		return (value != null) ? value : "";
-	}
-
-	/**
-	 * The same as {getProperty()} but calls {Boolean.parseBoolean(String)} for
+	 * The same as getProperty() but calls {Boolean.parseBoolean(String)} for
 	 * convenience.
 	 * 
 	 * @param option
 	 *            The config option we're trying to retrieve.
 	 * @return A boolean for this BOOLEAN option.
 	 */
-	public boolean getPropertyBoolean(ThebombzenAPIConfigOption option) {
-		return Boolean.parseBoolean(getProperty(option));
+	public boolean getBooleanProperty(ConfigOption option) {
+		if (option.getOptionType() != ConfigOption.BOOLEAN){
+			throw new UnsupportedOperationException("Can only work on a BOOLEAN!");
+		}
+		return ThebombzenAPI.parseBoolean(getStringProperty(option));
 	}
 
+	@SideOnly(Side.CLIENT)
+	public int getKeyCodeProperty(ConfigOption option){
+		if (option.getOptionType() != ConfigOption.KEY){
+			throw new UnsupportedOperationException("Can only work on a KEY!");
+		}
+		return Keyboard.getKeyIndex(getStringProperty(option));
+	}
+	
 	/**
 	 * Returns the file storing this mod's basic properties.
 	 */
@@ -108,10 +103,50 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 	}
 
 	/**
+	 * Get the value of a property that is either
+	 * @param option
+	 * @return
+	 */
+	@SideOnly(Side.CLIENT)
+	public boolean getSingleMultiProperty(ConfigOption option){
+		if (option.getOptionType() != ConfigOption.SINGLE_MULTI_BOOLEAN){
+			throw new UnsupportedOperationException("Can only work on a SINGLE_MULTI_BOOLEAN!");
+		}
+		String value = getStringProperty(option);
+		if (value.equalsIgnoreCase("always")){
+			return true;
+		} else if (value.equalsIgnoreCase("never")){
+			return false;
+		} else if (value.toLowerCase().contains("singleplayer")){
+			return Minecraft.getMinecraft().isSingleplayer();
+		} else if (value.toLowerCase().contains("multiplayer")){
+			return !Minecraft.getMinecraft().isSingleplayer();
+		} else {
+			setProperty(option, option.getDefaultValue());
+			return getSingleMultiProperty(option);
+		}
+	}
+
+	/**
+	 * Returns the String value of the property associated with this
+	 * configuration.
+	 * 
+	 * @param option
+	 *            The config option we're trying to retrieve.
+	 * @return A String containing the property value (too bad it's low in
+	 *         this recession), or an empty string if the property was not
+	 *         found.
+	 */
+	public String getStringProperty(ConfigOption option) {
+		String value = properties.getProperty(option.toString());
+		return (value != null) ? value : "";
+	}
+
+	/**
 	 * Initialize all options to their defaults (before loading from the disk).
 	 */
 	private void initializeDefaults() {
-		for (ThebombzenAPIConfigOption option : getAllOptions()) {
+		for (ConfigOption option : getAllOptions()) {
 			setPropertyWithoutSave(option, option.getDefaultValue());
 		}
 	}
@@ -127,7 +162,7 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 		loadProperties();
 		saveProperties();
 	}
-
+	
 	/**
 	 * Loads the properties file into the mod's configuration, sets the mod's
 	 * default toggles from those options, and stores the last modified date of
@@ -143,10 +178,13 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 		Reader reader = new BufferedReader(new FileReader(propsFile));
 		properties.load(reader);
 		reader.close();
-		for (ThebombzenAPIConfigOption option : getAllOptions()) {
+		for (ConfigOption option : getAllOptions()) {
 			if (option.getDefaultToggleIndex() >= 0) {
 				mod.setToggleDefaultEnabled(option.getDefaultToggleIndex(),
-						getPropertyBoolean(option));
+						getBooleanProperty(option));
+			}
+			if (option.getOptionType() == ConfigOption.FINITE_STRING && !Arrays.asList(option.getFiniteStringOptions()).contains(getStringProperty(option))){
+				setPropertyWithoutSave(option, option.getDefaultValue());
 			}
 		}
 		lastCheckedConfigLastModified = getPropertyFile().lastModified();
@@ -177,15 +215,14 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 			PrintWriter writer = new PrintWriter(new BufferedWriter(
 					new FileWriter(getPropertyFile())));
 			properties.store(writer, mod.getLongName() + " basic properties");
-			ThebombzenAPIConfigOption[] options = getAllOptions();
-			Arrays.sort(options);
+			ConfigOption[] options = getAllOptions();
 			StringBuilder builder = new StringBuilder();
-			for (ThebombzenAPIConfigOption option : options) {
+			for (ConfigOption option : options) {
 				builder.append("# ").append(option.toString())
-						.append(ThebombzenAPI.newLine);
+						.append(ThebombzenAPI.NEWLINE);
 				for (String info : option.getInfo()) {
 					builder.append("#     ").append(info)
-							.append(ThebombzenAPI.newLine);
+							.append(ThebombzenAPI.NEWLINE);
 				}
 			}
 			writer.write(builder.toString());
@@ -205,7 +242,7 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 	 * @param value
 	 *            The value of the config option we're setting
 	 */
-	public void setProperty(ThebombzenAPIConfigOption option, String value) {
+	public void setProperty(ConfigOption option, String value) {
 		setPropertyWithoutSave(option, value);
 		saveProperties();
 	}
@@ -219,8 +256,9 @@ public class ThebombzenAPIConfiguration<T extends Enum<T> & ThebombzenAPIConfigO
 	 * @param value
 	 *            The value of the config option we're setting
 	 */
-	protected void setPropertyWithoutSave(ThebombzenAPIConfigOption option,
+	protected void setPropertyWithoutSave(ConfigOption option,
 			String value) {
+		//System.out.println(option + value);
 		properties.setProperty(option.toString(), value);
 	}
 

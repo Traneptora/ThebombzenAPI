@@ -10,9 +10,10 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
 
+import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
-import thebombzen.mods.thebombzenapi.ThebombzenAPIConfigOption;
-import thebombzen.mods.thebombzenapi.ThebombzenAPIConfiguration;
+import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
+import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -28,7 +29,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	/**
 	 * The configuration associated with this screen.
 	 */
-	protected ThebombzenAPIConfiguration<?> config;
+	protected ThebombzenAPIConfiguration config;
 
 	/**
 	 * The button currently being used to set keystrokes.
@@ -55,7 +56,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	 * ThebombzenAPIConfigOption provides a mapping to retrieve the option from
 	 * the button.
 	 */
-	protected Map<ThebombzenAPIConfigGuiButton, ThebombzenAPIConfigOption> tooltipButtons = new HashMap<ThebombzenAPIConfigGuiButton, ThebombzenAPIConfigOption>();
+	protected Map<ConfigGuiButton, ConfigOption> tooltipButtons = new HashMap<ConfigGuiButton, ConfigOption>();
 
 	/**
 	 * Construct a config screen.
@@ -68,7 +69,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	 *            The configuration associated with this config screen.
 	 */
 	protected ThebombzenAPIConfigScreen(ThebombzenAPIBaseMod mod,
-			GuiScreen parentScreen, ThebombzenAPIConfiguration<?> config) {
+			GuiScreen parentScreen, ThebombzenAPIConfiguration config) {
 		this.mod = mod;
 		title = mod.getLongName() + " Options";
 		this.config = config;
@@ -90,20 +91,24 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 			mc.displayGuiScreen(this.parentScreen);
 			return;
 		} else if (id >= 4913) {
-			ThebombzenAPIConfigOption option = tooltipButtons.get(button);
-			if (option.getOptionType() == ThebombzenAPIConfigOption.BOOLEAN) {
-				boolean newProp = !config.getPropertyBoolean(option);
+			ConfigOption option = tooltipButtons.get(button);
+			if (option.getOptionType() == ConfigOption.BOOLEAN) {
+				boolean newProp = !config.getBooleanProperty(option);
 				config.setProperty(option, Boolean.toString(newProp));
 				// field_146128_j == displayString
 				button.displayString = getDisplayGuiString(option);
-			} else if (option.getOptionType() == ThebombzenAPIConfigOption.FINITE_STRING) {
-				String[] strings = option.getFiniteStringOptions();
-				int index = Arrays.asList(strings).indexOf(
-						config.getProperty(option));
+			} else if (option.getOptionType() == ConfigOption.FINITE_STRING || option.getOptionType() == ConfigOption.SINGLE_MULTI_BOOLEAN) {
+				String[] strings;
+				if (option.getOptionType() == ConfigOption.FINITE_STRING){
+					strings = option.getFiniteStringOptions();
+				} else {
+					strings = ThebombzenAPI.singleMultiStrings;
+				}
+				int index = Arrays.asList(strings).indexOf(config.getStringProperty(option));
 				index = (index + 1) % strings.length;
 				config.setProperty(option, strings[index]);
 				button.displayString = getDisplayGuiString(option);
-			} else if (option.getOptionType() == ThebombzenAPIConfigOption.KEY) {
+			} else if (option.getOptionType() == ConfigOption.KEY) {
 				if (button != currentKeyButton) {
 					if (currentKeyButton != null) {
 						currentKeyButton.displayString = getDisplayGuiString(tooltipButtons
@@ -129,7 +134,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 				16777215);
 		super.drawScreen(i, j, f);
 		// field_146297_k == mc
-		for (ThebombzenAPIConfigGuiButton button : tooltipButtons.keySet()) {
+		for (ConfigGuiButton button : tooltipButtons.keySet()) {
 			button.drawTooltip(mc, i, j);
 		}
 	}
@@ -141,12 +146,12 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	 *            the config option
 	 * @return The display string in (key: value) format.
 	 */
-	protected String getDisplayGuiString(ThebombzenAPIConfigOption option) {
-		if (option.getOptionType() == ThebombzenAPIConfigOption.BOOLEAN) {
+	protected String getDisplayGuiString(ConfigOption option) {
+		if (option.getOptionType() == ConfigOption.BOOLEAN) {
 			return option.getShortInfo() + ": "
-					+ (config.getPropertyBoolean(option) ? "ON" : "OFF");
+					+ (config.getBooleanProperty(option) ? "ON" : "OFF");
 		} else {
-			return option.getShortInfo() + ": " + config.getProperty(option);
+			return option.getShortInfo() + ": " + config.getStringProperty(option);
 		}
 	}
 
@@ -156,15 +161,15 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
-		ThebombzenAPIConfigOption[] options = config.getAllOptions();
+		ConfigOption[] options = config.getAllOptions();
 		int i = 0;
-		for (ThebombzenAPIConfigOption option : options) {
-			if (option.getOptionType() == ThebombzenAPIConfigOption.ARBITRARY_STRING) {
+		for (ConfigOption option : options) {
+			if (option.getOptionType() == ConfigOption.ARBITRARY_STRING) {
 				continue;
 			}
 			// field_146294_l == width
 			// field_146295_m == height
-			ThebombzenAPIConfigGuiButton button = new ThebombzenAPIConfigGuiButton(
+			ConfigGuiButton button = new ConfigGuiButton(
 					this, 4913 + i, width / 2 - 206 + (i & 1) * 207,
 					height / 6 + 23 * (i >> 1) - 18, 205, 20,
 					getDisplayGuiString(option), option.getInfo());
@@ -185,7 +190,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	public void keyTyped(char keyChar, int keyCode) {
 		super.keyTyped(keyChar, keyCode);
 		if (keyCode != 1 && currentKeyButton != null) {
-			ThebombzenAPIConfigOption option = tooltipButtons
+			ConfigOption option = tooltipButtons
 					.get(currentKeyButton);
 			config.setProperty(option, Keyboard.getKeyName(keyCode));
 			// field_146126_j == displayString

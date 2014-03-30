@@ -26,6 +26,7 @@ public class ModResourceInputStream extends FilterInputStream {
 		}
 	}
 	
+	@Override
 	public void close() throws IOException {
 		super.close();
 		if (zipFile != null){
@@ -33,6 +34,7 @@ public class ModResourceInputStream extends FilterInputStream {
 		}
 	}
 	
+	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 		zipFile.close();

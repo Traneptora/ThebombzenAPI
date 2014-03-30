@@ -14,7 +14,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author thebombzen
  */
 @SideOnly(Side.CLIENT)
-public class ThebombzenAPIConfigGuiButton extends GuiButton {
+public class ConfigGuiButton extends GuiButton {
 
 	/**
 	 * This is the parent screen. Used to determine tooltip placement.
@@ -51,14 +51,14 @@ public class ThebombzenAPIConfigGuiButton extends GuiButton {
 	 * @param tooltips
 	 *            A list of lines to display upon mouseover in a tooltip.
 	 */
-	public ThebombzenAPIConfigGuiButton(GuiScreen parentScreen, int id, int x,
+	public ConfigGuiButton(GuiScreen parentScreen, int id, int x,
 			int y, int width, int height, String displayString,
 			String... tooltips) {
 		super(id, x, y, width, height, displayString);
 		this.toolTips = tooltips;
 		this.parentScreen = parentScreen;
 	}
-
+	
 	/**
 	 * Construct a button, and use the default size.
 	 * 
@@ -75,13 +75,13 @@ public class ThebombzenAPIConfigGuiButton extends GuiButton {
 	 * @param tooltips
 	 *            A list of lines to display upon mouseover in a tooltip.
 	 */
-	public ThebombzenAPIConfigGuiButton(GuiScreen parentScreen, int id, int x,
+	public ConfigGuiButton(GuiScreen parentScreen, int id, int x,
 			int y, String displayString, String... tooltips) {
 		super(id, x, y, displayString);
 		this.toolTips = tooltips;
 		this.parentScreen = parentScreen;
 	}
-
+	
 	/**
 	 * This draws the tooltip over the button, and calls
 	 * the superclass draw function.
@@ -127,6 +127,22 @@ public class ThebombzenAPIConfigGuiButton extends GuiButton {
 						* lineHeight, -1);
 			}
 		}
+	}
+	
+	public int getHeight(){
+		return height;
+	}
+
+	public int getWidth(){
+		return width;
+	}
+
+	public void setHeight(int height){
+		this.height = height;
+	}
+
+	public void setWidth(int width){
+		this.width = width;
 	}
 
 }
