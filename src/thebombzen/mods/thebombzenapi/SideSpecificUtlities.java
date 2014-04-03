@@ -23,5 +23,7 @@ public interface SideSpecificUtlities {
 	 * @return true if this is the client, false if this is the server;
 	 */
 	public boolean isClient();
+	
+	public void crash(String info, Throwable e);
 
 }

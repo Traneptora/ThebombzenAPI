@@ -3,6 +3,7 @@ package thebombzen.mods.thebombzenapi.client;
 import java.io.File;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.crash.CrashReport;
 import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -23,6 +24,11 @@ public class ClientSideSpecificUtilities implements SideSpecificUtlities {
 	@Override
 	public boolean isClient() {
 		return true;
+	}
+
+	@Override
+	public void crash(String info, Throwable e) {
+		Minecraft.getMinecraft().displayCrashReport(new CrashReport(info, e));
 	}
 
 }

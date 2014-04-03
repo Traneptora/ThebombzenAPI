@@ -134,16 +134,11 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	public void forceDebug(String format, Object... args) {
 		String s = String.format(format, args);
-		if (s.matches("=+")) {
-			String total = debugBuilder.toString();
-			debugBuilder = new StringBuilder();
-			if (!total.equals(prevDebugString)) {
-				debugLogger.print(total);
-				debugLogger.flush();
-				prevDebugString = total;
-			}
+		System.err.println(s);
+		if (debugLogger != null){
+			debugLogger.println(s);
+			debugLogger.flush();
 		}
-		debugBuilder.append(s).append(ThebombzenAPI.NEWLINE);
 	}
 
 	/**
@@ -534,15 +529,14 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 *            if true, crash the client. If false, only log the exception.
 	 */
 	public void throwException(String info, Throwable exception, boolean fatal) {
-		System.err.println(info);
+		forceDebug(info);
 		exception.printStackTrace();
 		if (debugLogger != null) {
-			debugLogger.println(info);
 			exception.printStackTrace(debugLogger);
 			debugLogger.flush();
 		}
 		if (fatal) {
-			throw new RuntimeException(info, exception);
+			ThebombzenAPI.sideSpecificUtilities.crash(info, exception);
 		}
 	}
 

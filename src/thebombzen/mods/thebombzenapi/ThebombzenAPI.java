@@ -40,7 +40,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0pre2")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0pre3")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -311,15 +311,34 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @param methodName
 	 * @return true if methodName is on the method stack, false otherwise.
 	 */
-	public static boolean isCurrentlyExecutingMethod(String methodName) {
+	public static boolean isCurrentlyExecutingMethod(String classname, String methodName) {
 		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
 		for (StackTraceElement element : trace) {
-			if (element.getMethodName().equals(methodName)) {
+			if (element.getClassName().equals(classname) && element.getMethodName().equals(methodName)) {
 				return true;
 			}
 		}
 		return false;
 	}
+	
+	public static boolean isCurrentlyExecutingMethodRepeatedly(String classname, String methodName, int n) {
+		if (n < 0){
+			return false;
+		} else if (n == 0){
+			return true;
+		}
+		int found = 0;
+		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+		for (StackTraceElement element : trace) {
+			if (element.getClassName().equals(classname) && element.getMethodName().equals(methodName)) {
+				if (++found >= n){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Checks to see if the current world is a freshly loaded world and is the first world loaded.
 	 * @return
@@ -513,7 +532,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.4.0pre2, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.4.0pre3, Minecraft 1.7.2";
 	}
 
 	@Override

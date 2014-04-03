@@ -27,4 +27,11 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 		return false;
 	}
 
+	@Override
+	public void crash(String info, Throwable e) {
+		System.exit(-1);
+	}
+	
+	
+
 }
