@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
+import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.input.Keyboard;
 
@@ -40,7 +41,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0pre3")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0pre4")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -77,9 +78,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * detect a world change.
 	 */
 	@SideOnly(Side.CLIENT)
-	public static int prevWorld;
-	
-	public static final String[] singleMultiStrings = new String[]{"Never", "Singleplayer Only", "Multiplayer Only", "Always"};
+	private static int prevWorld;
+	@SideOnly(Side.CLIENT)
+	private static boolean hasStart;
 	
 	private static MetaConfiguration dummyConfig = null;
 	//private static Map<ThebombzenAPIBaseMod, Map<Integer, Boolean>> keysPreviouslyDown = new HashMap<ThebombzenAPIBaseMod, Map<Integer, Boolean>>(); 
@@ -466,6 +467,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
 	
+	
+	
 	/**
 	 * Main client tick loop.
 	 * 
@@ -476,15 +479,21 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	@SubscribeEvent
 	public void clientTick(ClientTickEvent tickEvent) {
 
-		if (!tickEvent.phase.equals(Phase.START)) {
-			return;
-		}
-
 		Minecraft mc = Minecraft.getMinecraft();
-
+		
 		if (mc.theWorld == null) {
 			return;
 		}
+		
+		if (tickEvent.phase.equals(Phase.END)) {
+			if (hasStart){
+				prevWorld = System.identityHashCode(mc.theWorld);
+			}
+			return;
+		} else {
+			hasStart = true;
+		}
+
 		if (isWorldFirstLoadedWorld()) {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				String latestVersion = mod.getLatestVersion();
@@ -511,7 +520,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 				mod.throwException("Could not read properties!", ioe, false);
 			}
 		}
-		prevWorld = System.identityHashCode(mc.theWorld);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -532,7 +540,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.4.0pre3, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.4.0pre4, Minecraft 1.7.2";
 	}
 
 	@Override
@@ -613,6 +621,23 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.init1(event);
 		}
+	}
+	
+	@SubscribeEvent
+	public void worldLoaded(WorldEvent.Load event){
+		if (event.world.isRemote){
+			hasStart = false;
+		}
+	}
+
+	public static boolean isSeparatorAtTopLevel(String info, int index){
+		String before = info.substring(0, index);
+		String after = info.substring(index + 1);
+		int beforeLeftCount = countOccurrences(before, '(');
+		int beforeRightCount = countOccurrences(before, ')');
+		int afterLeftCount = countOccurrences(after, '(');
+		int afterRightCount = countOccurrences(after, ')');
+		return (beforeLeftCount == beforeRightCount && afterLeftCount == afterRightCount);
 	}
 
 }

@@ -220,7 +220,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 					versionURL.openStream()));
 			latestVersion = br.readLine();
 			br.close();
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			latestVersion = getLongVersionString();
 		}
 		return latestVersion;
@@ -284,12 +284,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	/**
 	 * Returns a URL pointing toward the current version file.
 	 */
-	public URL getVersionFileURL() {
-		try {
-			return new URL(getVersionFileURLString());
-		} catch (MalformedURLException murle) {
-			return null;
-		}
+	public URL getVersionFileURL() throws MalformedURLException {
+		return new URL(getVersionFileURLString());
 	}
 
 	/**

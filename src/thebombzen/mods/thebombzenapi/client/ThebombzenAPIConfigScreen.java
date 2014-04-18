@@ -10,9 +10,9 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
 
-import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
 import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
+import thebombzen.mods.thebombzenapi.configuration.SingleMultiBoolean;
 import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -102,7 +102,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 				if (option.getOptionType() == ConfigOption.FINITE_STRING){
 					strings = option.getFiniteStringOptions();
 				} else {
-					strings = ThebombzenAPI.singleMultiStrings;
+					strings = SingleMultiBoolean.singleMultiStrings;
 				}
 				int index = Arrays.asList(strings).indexOf(config.getStringProperty(option));
 				index = (index + 1) % strings.length;
