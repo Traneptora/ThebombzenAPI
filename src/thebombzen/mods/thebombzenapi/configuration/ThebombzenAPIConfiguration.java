@@ -188,6 +188,11 @@ public abstract class ThebombzenAPIConfiguration {
 			}
 		}
 		lastCheckedConfigLastModified = getPropertyFile().lastModified();
+		File oldPropsFile = new File(ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory().getPath() + File.separator + "config" + File.separator + mod.getLongName() + ".cfg");
+		if (oldPropsFile.exists()){
+			oldPropsFile.delete();
+		}
+		
 	}
 
 	/**
