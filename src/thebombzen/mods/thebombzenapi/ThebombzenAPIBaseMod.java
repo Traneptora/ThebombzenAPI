@@ -66,7 +66,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	/**
 	 * A StringBuilder which builds a debug message.
 	 */
-	protected StringBuilder debugBuilder = new StringBuilder();
+	protected StringBuilder debugBuilder = null;
 
 	/**
 	 * This contains the previous debug String, to avoid printing exactly the
@@ -134,6 +134,22 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	public void forceDebug(String format, Object... args) {
 		String s = String.format(format, args);
+		if (s.matches("^=+START=+$")){
+			debugBuilder = new StringBuilder(s).append(ThebombzenAPI.NEWLINE);
+			return;
+		} else if (s.matches("^=+END=+$")){
+			debugBuilder.append(s).append(ThebombzenAPI.NEWLINE);
+			s = debugBuilder.toString();
+			debugBuilder = null;
+			if (s.equals(prevDebugString)){
+				return;
+			} else {
+				prevDebugString = s;
+			}
+		} else if (debugBuilder != null){
+			debugBuilder.append(s).append(ThebombzenAPI.NEWLINE);
+			return;
+		}
 		System.err.println(s);
 		if (debugLogger != null){
 			debugLogger.println(s);
@@ -526,13 +542,17 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	public void throwException(String info, Throwable exception, boolean fatal) {
 		forceDebug(info);
+		forceDebugException(exception);
+		if (fatal) {
+			ThebombzenAPI.sideSpecificUtilities.crash(info, exception);
+		}
+	}
+	
+	public void forceDebugException(Throwable exception){
 		exception.printStackTrace();
 		if (debugLogger != null) {
 			exception.printStackTrace(debugLogger);
 			debugLogger.flush();
-		}
-		if (fatal) {
-			ThebombzenAPI.sideSpecificUtilities.crash(info, exception);
 		}
 	}
 
