@@ -384,10 +384,10 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			}
 		}
 		if (s.length() == 0){
-			throw new NumberFormatException("Too short!");
+			throw new NumberFormatException("Too short");
 		}
 		if (s.contains("-") || s.contains("+")){
-			throw new NumberFormatException("Should not contain + or -!");
+			throw new NumberFormatException("Number should not contain + or - inside");
 		}
 		int i;
 		if (s.charAt(0) != '0'){

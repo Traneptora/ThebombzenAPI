@@ -73,6 +73,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * same thing repeatedly.
 	 */
 	protected String prevDebugString = "";
+	
+	protected String prevImmediateDebugString = "";
 
 	/**
 	 * Debug output goes to this file.
@@ -134,6 +136,9 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	public void forceDebug(String format, Object... args) {
 		String s = String.format(format, args);
+		if (s.equals(prevImmediateDebugString)){
+			return;
+		}
 		if (s.matches("^=+START=+$")){
 			debugBuilder = new StringBuilder(s).append(ThebombzenAPI.NEWLINE);
 			return;
@@ -150,6 +155,10 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			debugBuilder.append(s).append(ThebombzenAPI.NEWLINE);
 			return;
 		}
+		if (s.equals(prevImmediateDebugString)){
+			return;
+		}
+		prevImmediateDebugString = s;
 		System.err.println(s);
 		if (debugLogger != null){
 			debugLogger.println(s);
