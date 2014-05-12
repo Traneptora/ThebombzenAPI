@@ -41,7 +41,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0pre4")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.0")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
