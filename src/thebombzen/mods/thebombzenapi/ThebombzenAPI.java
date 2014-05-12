@@ -550,7 +550,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.4.0pre4, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.4.0, Minecraft 1.7.2";
 	}
 
 	@Override
