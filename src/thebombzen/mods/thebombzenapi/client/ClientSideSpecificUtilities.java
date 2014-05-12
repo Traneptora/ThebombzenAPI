@@ -17,6 +17,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ClientSideSpecificUtilities implements SideSpecificUtlities {
 
 	@Override
+	public void crash(String info, Throwable e) {
+		Minecraft.getMinecraft().displayCrashReport(new CrashReport(info, e));
+	}
+
+	@Override
 	public File getMinecraftDirectory() {
 		return Minecraft.getMinecraft().mcDataDir;
 	}
@@ -24,11 +29,6 @@ public class ClientSideSpecificUtilities implements SideSpecificUtlities {
 	@Override
 	public boolean isClient() {
 		return true;
-	}
-
-	@Override
-	public void crash(String info, Throwable e) {
-		Minecraft.getMinecraft().displayCrashReport(new CrashReport(info, e));
 	}
 
 }

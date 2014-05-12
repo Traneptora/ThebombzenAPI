@@ -9,11 +9,13 @@ import java.io.File;
  */
 public interface SideSpecificUtlities {
 
+	public void crash(String info, Throwable e);
+
 	/**
 	 * Get the base minecraft directory.
 	 */
 	public File getMinecraftDirectory();
-
+	
 	/**
 	 * Returns whether this is the client proxy. This is useful because
 	 * constructors don't get an Event and
@@ -23,7 +25,5 @@ public interface SideSpecificUtlities {
 	 * @return true if this is the client, false if this is the server;
 	 */
 	public boolean isClient();
-	
-	public void crash(String info, Throwable e);
 
 }

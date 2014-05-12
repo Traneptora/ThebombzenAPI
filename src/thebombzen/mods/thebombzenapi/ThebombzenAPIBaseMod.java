@@ -12,12 +12,12 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
+import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -162,6 +162,14 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		System.err.println(s);
 		if (debugLogger != null){
 			debugLogger.println(s);
+			debugLogger.flush();
+		}
+	}
+
+	public void forceDebugException(Throwable exception){
+		exception.printStackTrace();
+		if (debugLogger != null) {
+			exception.printStackTrace(debugLogger);
 			debugLogger.flush();
 		}
 	}
@@ -312,13 +320,13 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	public URL getVersionFileURL() throws MalformedURLException {
 		return new URL(getVersionFileURLString());
 	}
-
+	
 	/**
 	 * Returns a String containing a URL pointing toward the current version
 	 * file.
 	 */
 	protected abstract String getVersionFileURLString();
-	
+
 	/**
 	 * Equivalent of preInit. The config is not loaded during preInit, careful!
 	 */
@@ -405,7 +413,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		return toggles[index];
 	}
-
+	
+	
 	/**
 	 * Load memory data from the correct memory file.
 	 */
@@ -417,7 +426,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			saveCompoundToCurrentData(data);
 		}
 	}
-	
 	
 	/**
 	 * Read and return memory data from the specified file.
@@ -448,7 +456,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		return getCompoundFromCurrentData();
 	}
-	
+
 	/**
 	 * Sae the data compound to the current mod state.
 	 * 
@@ -537,7 +545,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		toggleKeyCodes[index] = keyCode;
 	}
-
+	
 	/**
 	 * Throws an exception in a controlled environment, and logs it to the debug
 	 * logger.
@@ -554,14 +562,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		forceDebugException(exception);
 		if (fatal) {
 			ThebombzenAPI.sideSpecificUtilities.crash(info, exception);
-		}
-	}
-	
-	public void forceDebugException(Throwable exception){
-		exception.printStackTrace();
-		if (debugLogger != null) {
-			exception.printStackTrace(debugLogger);
-			debugLogger.flush();
 		}
 	}
 

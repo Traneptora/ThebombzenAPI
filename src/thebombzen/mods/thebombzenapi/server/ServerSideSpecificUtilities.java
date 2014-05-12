@@ -17,6 +17,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 
 	@Override
+	public void crash(String info, Throwable e) {
+		System.exit(-1);
+	}
+
+	@Override
 	public File getMinecraftDirectory() {
 		File source = FMLCommonHandler.instance().findContainerFor(ThebombzenAPI.instance).getSource();
 		return source.getParentFile().getParentFile();
@@ -25,11 +30,6 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 	@Override
 	public boolean isClient() {
 		return false;
-	}
-
-	@Override
-	public void crash(String info, Throwable e) {
-		System.exit(-1);
 	}
 	
 	

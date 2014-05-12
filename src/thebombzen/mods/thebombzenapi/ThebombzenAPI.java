@@ -340,6 +340,16 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return false;
 	}
 	
+	public static boolean isSeparatorAtTopLevel(String info, int index){
+		String before = info.substring(0, index);
+		String after = info.substring(index + 1);
+		int beforeLeftCount = countOccurrences(before, '(');
+		int beforeRightCount = countOccurrences(before, ')');
+		int afterLeftCount = countOccurrences(after, '(');
+		int afterRightCount = countOccurrences(after, ')');
+		return (beforeLeftCount == beforeRightCount && afterLeftCount == afterRightCount);
+	}
+
 	/**
 	 * Checks to see if the current world is a freshly loaded world and is the first world loaded.
 	 * @return
@@ -415,7 +425,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		return i;
 	}
-
+	
 	/**
 	 * Registers the ThebombzenAPIBaseMod for use with ThebombzenAPI. Things will
 	 * probably not work if you don't register the mod. Note that your mod still
@@ -431,6 +441,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		//	keysPreviouslyDown.get(mod).put(i, false);
 		//}
 	}
+	
+	
 	
 	/**
 	 * Set the value of a private field. This one allows you to pass multiple
@@ -466,9 +478,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
-	
-	
-	
+
 	/**
 	 * Main client tick loop.
 	 * 
@@ -552,7 +562,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public String getShortName() {
 		return "TBZAPI";
 	}
-
+	
 	@Override
 	protected String getToggleMessageString(int index, boolean enabled) {
 		throw new UnsupportedOperationException("ThebombzenAPI has no toggles!");
@@ -563,7 +573,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		//return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
 		return "";
 	}
-	
+
 	@SubscribeEvent
 	public void handleKeyPress(KeyInputEvent event){
 		for (ThebombzenAPIBaseMod mod : mods){
@@ -594,7 +604,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			mod.init2(event);
 		}
 	}
-
+	
 	/**
 	 * FML postInit method. Does postInit stuff and calls init3 of the mods.
 	 * 
@@ -622,22 +632,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			mod.init1(event);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void worldLoaded(WorldEvent.Load event){
 		if (event.world.isRemote){
 			hasStart = false;
 		}
-	}
-
-	public static boolean isSeparatorAtTopLevel(String info, int index){
-		String before = info.substring(0, index);
-		String after = info.substring(index + 1);
-		int beforeLeftCount = countOccurrences(before, '(');
-		int beforeRightCount = countOccurrences(before, ')');
-		int afterLeftCount = countOccurrences(after, '(');
-		int afterRightCount = countOccurrences(after, ')');
-		return (beforeLeftCount == beforeRightCount && afterLeftCount == afterRightCount);
 	}
 
 }
