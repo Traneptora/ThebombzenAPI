@@ -12,9 +12,6 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import net.minecraft.client.Minecraft;
-
-import org.lwjgl.input.Keyboard;
-
 import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
 import cpw.mods.fml.relauncher.Side;
@@ -92,7 +89,7 @@ public abstract class ThebombzenAPIConfiguration {
 		if (option.getOptionType() != ConfigOption.KEY){
 			throw new UnsupportedOperationException("Can only work on a KEY!");
 		}
-		return Keyboard.getKeyIndex(getStringProperty(option));
+		return ThebombzenAPI.getExtendedKeyIndex(getStringProperty(option));
 	}
 	
 	/**

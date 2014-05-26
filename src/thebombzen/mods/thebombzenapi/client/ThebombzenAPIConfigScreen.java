@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
 import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
@@ -118,6 +120,17 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 					currentKeyButton = button;
 				}
 			}
+		}
+	}
+	
+	public void mouseClicked(int x, int y, int button){
+		if (Minecraft.getMinecraft().currentScreen == this && currentKeyButton != null){
+			ConfigOption option = tooltipButtons.get(currentKeyButton);
+			config.setProperty(option, Mouse.getButtonName(button));
+			currentKeyButton.displayString = getDisplayGuiString(option);
+			currentKeyButton = null;
+		} else {
+			super.mouseClicked(x, y, button);
 		}
 	}
 

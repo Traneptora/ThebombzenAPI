@@ -20,6 +20,7 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -31,6 +32,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
+import cpw.mods.fml.common.gameevent.InputEvent.MouseInputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
@@ -129,6 +131,15 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	public static int countOccurrences(String s, char c){
 		return s.length() - s.replace(Character.toString(c), "").length();
+	}
+	
+	public static int getExtendedKeyIndex(String name){
+		int index = Mouse.getButtonIndex(name);
+		if (index == -1){
+			return Keyboard.getKeyIndex(name);
+		} else {
+			return index - 100;
+		}
 	}
 	
 	/**
@@ -340,6 +351,18 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return false;
 	}
 	
+	public static boolean isExtendedKeyDown(String name){
+		return isExtendedKeyDown(getExtendedKeyIndex(name));
+	}
+	
+	public static boolean isExtendedKeyDown(int index){
+		if (index < 0){
+			return Mouse.isButtonDown(index + 100);
+		} else {
+			return Keyboard.isKeyDown(index);
+		}
+	}
+	
 	public static boolean isSeparatorAtTopLevel(String info, int index){
 		String before = info.substring(0, index);
 		String after = info.substring(index + 1);
@@ -443,7 +466,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 	
 	
-	
 	/**
 	 * Set the value of a private field. This one allows you to pass multiple
 	 * field names (useful for obfuscation).
@@ -499,6 +521,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			if (hasStart){
 				prevWorld = System.identityHashCode(mc.theWorld);
 			}
+			hasStart = false;
 			return;
 		} else {
 			hasStart = true;
@@ -573,18 +596,28 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
 	}
 
-	@SubscribeEvent
-	public void handleKeyPress(KeyInputEvent event){
+	public static void handleToggles(){
 		for (ThebombzenAPIBaseMod mod : mods){
 			int num = mod.getNumToggleKeys();
 			for (int i = 0; i < num; i++){
-				if (Keyboard.isKeyDown(mod.getToggleKeyCode(i)) && !Keyboard.isRepeatEvent()){
+				int toggleKeyCode = mod.getToggleKeyCode(i);
+				if (ThebombzenAPI.isExtendedKeyDown(toggleKeyCode) && (toggleKeyCode < 0 && Mouse.getEventButton() != -1 || toggleKeyCode >= 0 && !Keyboard.isRepeatEvent())){
 					boolean enabled = mod.isToggleEnabled(i);
 					mod.setToggleEnabled(i, !enabled, true);
 					mod.writeToCorrectMemoryFile();
 				}
 			}
 		}
+	}
+	
+	@SubscribeEvent
+	public void handleMouseClick(MouseInputEvent event){
+		handleToggles();
+	}
+	
+	@SubscribeEvent
+	public void handleKeyPress(KeyInputEvent event){
+		handleToggles();
 	}
 
 	/**
