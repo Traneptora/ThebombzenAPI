@@ -42,7 +42,7 @@ import org.lwjgl.input.Mouse;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.2")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION)
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -572,7 +572,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.5.0, Minecraft 1.8";
+		return "ThebombzenAPI, version " + Constants.VERSION + ", Minecraft " + Constants.MC_VERSION;
 	}
 
 	@Override
