@@ -26,6 +26,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import thebombzen.mods.thebombzenapi.Constants;
+
 public class APIInstallerFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
@@ -241,6 +243,8 @@ public class APIInstallerFrame extends JFrame {
 		}
 		File modsFolder = new File(directory, "mods");
 		modsFolder.mkdir();
+		File versionFolder = new File(modsFolder, Constants.MC_VERSION);
+		versionFolder.mkdir();
 		File file = new File(APIInstallerFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 		JarFile jarFile = new JarFile(file);
 		if (jarFile.getEntry("thebombzen/mods/thebombzenapi/installer/APIInstallerFrame.class") == null){
@@ -249,12 +253,18 @@ public class APIInstallerFrame extends JFrame {
 		}
 		jarFile.close();
 		File[] mods = modsFolder.listFiles();
+		File[] modsVersion = versionFolder.listFiles();
 		for (File testMod : mods){
 			if (testMod.getName().matches("^ThebombzenAPI-v\\d\\.\\d(\\.\\d)?-mc\\d\\.\\d(\\.\\d)?\\.(jar|zip)$")){
 				testMod.delete();
 			}
 		}
-		copyFile(file, new File(modsFolder, file.getName()));
+		for (File testMod : modsVersion){
+			if (testMod.getName().matches("^ThebombzenAPI-v\\d\\.\\d(\\.\\d)?-mc\\d\\.\\d(\\.\\d)?\\.(jar|zip)$")){
+				testMod.delete();
+			}
+		}
+		copyFile(file, new File(versionFolder, file.getName()));
 		JOptionPane.showMessageDialog(this, "Successfully installed ThebombzenAPI!", "Success!", JOptionPane.INFORMATION_MESSAGE);
 		System.exit(0);
 	}
