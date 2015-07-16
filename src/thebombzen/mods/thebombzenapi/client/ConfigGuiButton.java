@@ -4,8 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * This is a {GuiButton} that provides a tooltip for a config option upon mouse
@@ -97,7 +97,7 @@ public class ConfigGuiButton extends GuiButton {
 				&& i < (xPosition + width)
 				&& j < (yPosition + height)) {
 
-			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 
 			int lineHeight = fontRenderer.FONT_HEIGHT + 3;
 

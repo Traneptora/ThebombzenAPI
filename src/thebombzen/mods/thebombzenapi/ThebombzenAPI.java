@@ -18,32 +18,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent.MouseInputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
-import cpw.mods.fml.common.gameevent.InputEvent.MouseInputEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * This is the core of the API and contains many utility functions.
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.1")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = "2.4.2")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -169,7 +168,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @throws FieldNotFoundException If some other error occurred
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, E> T getPrivateField(E instance, Class<? super E> declaringClass,
+	public static <T> T getPrivateField(Object instance, Class<?> declaringClass,
 			String... names) throws FieldNotFoundException {
 		for (String name : names) {
 			try {
@@ -268,7 +267,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @throws SecurityException if a security error occurs
 	 * @throws MethodNotFoundException if another error occurs
 	 */
-	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass,
+	public static <T> T invokePrivateMethod(Object instance, Class<?> declaringClass,
 			String name, Class<?>[] parameterTypes, Object... args) throws MethodNotFoundException {
 		return invokePrivateMethod(instance, declaringClass, new String[] { name },
 				parameterTypes, args);
@@ -298,7 +297,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @throws MethodNotFoundException if another error occurs
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, E> T invokePrivateMethod(E instance, Class<? super E> declaringClass, String[] names, Class<?>[] parameterTypes, Object... args) throws MethodNotFoundException {
+	public static <T> T invokePrivateMethod(Object instance, Class<?> declaringClass, String[] names, Class<?>[] parameterTypes, Object... args) throws MethodNotFoundException {
 		for (String name : names) {
 			try {
 				Method method = declaringClass.getDeclaredMethod(name, parameterTypes);
@@ -483,7 +482,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @throws SecurityException If a security error occurred
 	 * @throws FieldNotFoundException If some other error occurred
 	 */
-	public static <E> void setPrivateField(E instance, Class<? super E> declaringClass, Object value, String... names){
+	public static void setPrivateField(Object instance, Class<?> declaringClass, Object value, String... names){
 		for (String name : names) {
 			try {
 				Field field = declaringClass.getDeclaredField(name);
@@ -532,7 +531,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 				String latestVersion = mod.getLatestVersion();
 				if (!latestVersion.equals(mod.getLongVersionString())) {
 					mc.thePlayer.addChatMessage(new ChatComponentText(latestVersion + " is available. "));
-					mc.thePlayer.addChatMessage(IChatComponent.Serializer.func_150699_a("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+					mc.thePlayer.addChatMessage(IChatComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
 				}
 			}
 		}
@@ -573,7 +572,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version 2.4.1, Minecraft 1.7.2";
+		return "ThebombzenAPI, version 2.5.0, Minecraft 1.8";
 	}
 
 	@Override
@@ -656,10 +655,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		initialize();
 		FMLCommonHandler.instance().bus().register(this);
 		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
 		dummyConfig = new MetaConfiguration();
+		for (ThebombzenAPIBaseMod mod : mods){
+			mod.initialize();
+		}
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.init1(event);
 		}

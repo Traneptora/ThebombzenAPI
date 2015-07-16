@@ -17,13 +17,13 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * This class is the superclass of Thebombzen's mods. Extend this to get
@@ -87,9 +87,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * that extend this one.
 	 */
 	public ThebombzenAPIBaseMod(){
-		if (!ThebombzenAPI.class.isAssignableFrom(getClass())){
-			initialize();
-		}
+		ThebombzenAPI.registerMod(this);
 	}
 	
 	@Override
@@ -136,6 +134,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	public void forceDebug(String format, Object... args) {
 		String s = String.format(format, args);
+		System.err.println(s);
 		if (s.equals(prevImmediateDebugString)){
 			return;
 		}
@@ -159,7 +158,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			return;
 		}
 		prevImmediateDebugString = s;
-		System.err.println(s);
 		if (debugLogger != null){
 			debugLogger.println(s);
 			debugLogger.flush();
@@ -233,7 +231,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			return new File(getModFolder(),
 					getLongName().toUpperCase()
 							+ "_MEMORY_"
-							+ Minecraft.getMinecraft().func_147104_D().serverIP
+							+ Minecraft.getMinecraft().getCurrentServerData().serverIP
 									.toLowerCase() + ".dat");
 		}
 	}
@@ -360,8 +358,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			toggles = new boolean[getNumToggleKeys()];
 			defaultToggles = new boolean[getNumToggleKeys()];
 		}
-
-		ThebombzenAPI.registerMod(this);
 
 		File mineFile = ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory();
 		File modsFolder = new File(mineFile, "mods");

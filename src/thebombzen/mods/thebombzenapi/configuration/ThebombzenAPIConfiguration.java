@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * This class represents a configuration for a mod.
@@ -170,6 +170,7 @@ public abstract class ThebombzenAPIConfiguration {
 	 */
 	protected void loadProperties() throws IOException {
 		if (!propsFile.exists()) {
+			propsFile.getParentFile().mkdirs();
 			propsFile.createNewFile();
 		}
 		Reader reader = new BufferedReader(new FileReader(propsFile));

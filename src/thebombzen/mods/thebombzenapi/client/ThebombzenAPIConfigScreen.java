@@ -1,5 +1,6 @@
 package thebombzen.mods.thebombzenapi.client;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -16,8 +19,6 @@ import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
 import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
 import thebombzen.mods.thebombzenapi.configuration.SingleMultiBoolean;
 import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * This is a config screen for a mod, based on a configuration.
@@ -123,7 +124,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 		}
 	}
 	
-	public void mouseClicked(int x, int y, int button){
+	public void mouseClicked(int x, int y, int button) throws IOException {
 		if (Minecraft.getMinecraft().currentScreen == this && currentKeyButton != null){
 			ConfigOption option = tooltipButtons.get(currentKeyButton);
 			config.setProperty(option, Mouse.getButtonName(button));
@@ -200,7 +201,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	 * Deal with KEY options when a key is typed.
 	 */
 	@Override
-	public void keyTyped(char keyChar, int keyCode) {
+	public void keyTyped(char keyChar, int keyCode) throws IOException {
 		super.keyTyped(keyChar, keyCode);
 		if (keyCode != 1 && currentKeyButton != null) {
 			ConfigOption option = tooltipButtons
