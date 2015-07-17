@@ -31,7 +31,5 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 	public boolean isClient() {
 		return false;
 	}
-	
-	
 
 }
