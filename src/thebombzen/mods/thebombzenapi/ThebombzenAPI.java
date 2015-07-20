@@ -594,7 +594,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	@Override
 	protected String getVersionFileURLString() {
-		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion.txt";
+		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
 	}
 
 	public static void handleToggles(){
