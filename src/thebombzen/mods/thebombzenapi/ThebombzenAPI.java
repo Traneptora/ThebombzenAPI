@@ -19,6 +19,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -658,6 +659,11 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		FMLCommonHandler.instance().bus().register(this);
 		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
 		dummyConfig = new MetaConfiguration();
+		for (Object mod : Loader.instance().getReversedModObjectList().keySet()){
+			if (mod instanceof ThebombzenAPIBaseMod){
+				mods.add((ThebombzenAPIBaseMod)mod);
+			}
+		}
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.initialize();
 		}

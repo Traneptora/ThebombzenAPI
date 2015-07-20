@@ -80,15 +80,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * Debug output goes to this file.
 	 */
 	protected File debugFile;
-
-	/**
-	 * This is the standard constructor. By using a constructor routine
-	 * rather than preInit/load/postInit we don't need method stubs in the classes
-	 * that extend this one.
-	 */
-	public ThebombzenAPIBaseMod(){
-		ThebombzenAPI.registerMod(this);
-	}
 	
 	@Override
 	public int compareTo(ThebombzenAPIBaseMod mod){
