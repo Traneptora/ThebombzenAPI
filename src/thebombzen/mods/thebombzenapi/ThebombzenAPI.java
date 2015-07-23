@@ -562,16 +562,26 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
 	
+	/**
+	 * Send update reminders about the most recent version of the mods.
+	 */
 	private void sendUpdateReminders(){
-		for (ThebombzenAPIBaseMod mod : mods) {
-			String latestVersion = mod.getLatestVersion();
-			if (!latestVersion.equals(mod.getLongVersionString())) {
-				sideSpecificUtilities.addMessageToOwner(new ChatComponentText(latestVersion + " is available. "));
-				sideSpecificUtilities.addMessageToOwner(IChatComponent.Serializer.func_150699_a("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
+			for (ThebombzenAPIBaseMod mod : mods) {
+				String latestVersion = mod.getLatestVersion();
+				System.err.println(latestVersion);
+				if (!latestVersion.equals(mod.getLongVersionString())) {
+					sideSpecificUtilities.addMessageToOwner(new ChatComponentText(latestVersion + " is available. "));
+					sideSpecificUtilities.addMessageToOwner(IChatComponent.Serializer.func_150699_a("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+				}
 			}
 		}
 	}
 	
+	/**
+	 * Handle events on server-start on the serverside.
+	 * Currently affects update reminders only.
+	 */
 	@SideOnly(Side.SERVER)
 	@EventHandler
 	public void serverStarted(FMLServerStartedEvent event){
@@ -634,7 +644,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			hasStart = true;
 		}
 
-		if (isWorldFirstLoadedWorld() && this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)) {
+		if (isWorldFirstLoadedWorld()) {
 			sendUpdateReminders();
 		}
 
@@ -644,16 +654,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			}
 		}
 
-		for (ThebombzenAPIBaseMod mod : mods) {
-			try {
-				boolean did = mod.getConfiguration().reloadPropertiesFromFileIfChanged();
-				if (did){
-					mc.thePlayer.addChatMessage(new ChatComponentText("Reloaded " + mod.getLongName() + " configuration."));
-				}
-			} catch (IOException ioe) {
-				mod.throwException("Could not read properties!", ioe, false);
-			}
-		}
+		reloadPropertiesIfChanged();
 	}
 
 	@SuppressWarnings("unchecked")
