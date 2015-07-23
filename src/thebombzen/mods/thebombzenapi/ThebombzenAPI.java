@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION)
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "thebombzen.mods.thebombzenapi.client.ConfigGuiFactory")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -528,7 +528,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			hasStart = true;
 		}
 
-		if (isWorldFirstLoadedWorld()) {
+		if (isWorldFirstLoadedWorld() && this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)) {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				String latestVersion = mod.getLatestVersion();
 				if (!latestVersion.equals(mod.getLongVersionString())) {
