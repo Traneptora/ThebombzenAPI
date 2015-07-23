@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.MouseInputEvent;
@@ -548,6 +549,24 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
+	
+	private void sendUpdateReminders(){
+		for (ThebombzenAPIBaseMod mod : mods) {
+			String latestVersion = mod.getLatestVersion();
+			if (!latestVersion.equals(mod.getLongVersionString())) {
+				sideSpecificUtilities.addMessageToOwner(new ChatComponentText(latestVersion + " is available. "));
+				sideSpecificUtilities.addMessageToOwner(IChatComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+			}
+		}
+	}
+	
+	@SideOnly(Side.SERVER)
+	@EventHandler
+	private void serverStarted(FMLServerStartedEvent event){
+		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
+			sendUpdateReminders();
+		}
+	}
 
 	/**
 	 * Main client tick loop.
@@ -576,13 +595,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 
 		if (isWorldFirstLoadedWorld() && this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)) {
-			for (ThebombzenAPIBaseMod mod : mods) {
-				String latestVersion = mod.getLatestVersion();
-				if (!latestVersion.equals(mod.getLongVersionString())) {
-					mc.thePlayer.addChatMessage(new ChatComponentText(latestVersion + " is available. "));
-					mc.thePlayer.addChatMessage(IChatComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
-				}
-			}
+			sendUpdateReminders();
 		}
 
 		if (hasWorldChanged()) {

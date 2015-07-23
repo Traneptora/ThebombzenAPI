@@ -2,6 +2,8 @@ package thebombzen.mods.thebombzenapi.server;
 
 import java.io.File;
 
+import net.minecraft.network.rcon.RConConsoleSource;
+import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -18,7 +20,7 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 
 	@Override
 	public void crash(String info, Throwable e) {
-		FMLCommonHandler.instance().exitJava(1, true);
+		FMLCommonHandler.instance().exitJava(1, false);
 	}
 
 	@Override
@@ -30,6 +32,11 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 	@Override
 	public boolean isClient() {
 		return false;
+	}
+
+	@Override
+	public void addMessageToOwner(IChatComponent chatComponent) {
+		RConConsoleSource.getInstance().addChatMessage(chatComponent);
 	}
 
 }
