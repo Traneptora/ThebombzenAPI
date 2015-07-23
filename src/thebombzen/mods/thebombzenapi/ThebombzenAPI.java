@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.MouseInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -550,21 +551,58 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		throw new FieldNotFoundException("Names not found: " + Arrays.toString(names));
 	}
 	
+	/**
+	 * Send update reminders about the most recent version of the mods.
+	 */
 	private void sendUpdateReminders(){
-		for (ThebombzenAPIBaseMod mod : mods) {
-			String latestVersion = mod.getLatestVersion();
-			if (!latestVersion.equals(mod.getLongVersionString())) {
-				sideSpecificUtilities.addMessageToOwner(new ChatComponentText(latestVersion + " is available. "));
-				sideSpecificUtilities.addMessageToOwner(IChatComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
+			for (ThebombzenAPIBaseMod mod : mods) {
+				String latestVersion = mod.getLatestVersion();
+				if (!latestVersion.equals(mod.getLongVersionString())) {
+					sideSpecificUtilities.addMessageToOwner(new ChatComponentText(latestVersion + " is available. "));
+					sideSpecificUtilities.addMessageToOwner(IChatComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+				}
 			}
 		}
 	}
 	
+	/**
+	 * Handle events on server-start on the serverside.
+	 * Currently affects update reminders only.
+	 */
 	@SideOnly(Side.SERVER)
 	@EventHandler
 	private void serverStarted(FMLServerStartedEvent event){
-		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
-			sendUpdateReminders();
+		sendUpdateReminders();
+	}
+	
+	/**
+	 * Handle server-side tick events.
+	 * Currently only affects reloading the configurations.
+	 * @param event
+	 */
+	@SideOnly(Side.SERVER)
+	@SubscribeEvent
+	public void serverTick(ServerTickEvent event){
+		if (!event.phase.equals(Phase.START)){
+			return;
+		}
+		reloadPropertiesIfChanged();
+	}
+	
+	/**
+	 * Reload the properties files for all the mods, provided that they've changed.
+	 */
+	private void reloadPropertiesIfChanged(){
+		for (ThebombzenAPIBaseMod mod : mods) {
+			try {
+				boolean did = mod.getConfiguration().reloadPropertiesFromFileIfChanged();
+				if (did){
+					sideSpecificUtilities.addMessageToOwner(new ChatComponentText("Reloaded " + mod.getLongName() + " configuration."));
+				}
+			} catch (IOException ioe) {
+				mod.throwException("Could not read properties!", ioe, false);
+			}
 		}
 	}
 
@@ -594,7 +632,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			hasStart = true;
 		}
 
-		if (isWorldFirstLoadedWorld() && this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)) {
+		if (isWorldFirstLoadedWorld()) {
 			sendUpdateReminders();
 		}
 
@@ -604,16 +642,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			}
 		}
 
-		for (ThebombzenAPIBaseMod mod : mods) {
-			try {
-				boolean did = mod.getConfiguration().reloadPropertiesFromFileIfChanged();
-				if (did){
-					mc.thePlayer.addChatMessage(new ChatComponentText("Reloaded " + mod.getLongName() + " configuration."));
-				}
-			} catch (IOException ioe) {
-				mod.throwException("Could not read properties!", ioe, false);
-			}
-		}
+		reloadPropertiesIfChanged();
 	}
 
 	@SuppressWarnings("unchecked")
