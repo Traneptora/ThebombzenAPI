@@ -82,10 +82,18 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@SideOnly(Side.CLIENT)
 	private static int prevWorld;
+	
+	/**
+	 * The first tick to be executed is actually an "end" tick, not a start tick.
+	 * This helps ensure we only care about "end" ticks if a "start" one has already occurred.
+	 */
 	@SideOnly(Side.CLIENT)
 	private static boolean hasStart;
-	
-	private static MetaConfiguration dummyConfig = null;
+
+	/**
+	 * The configuration for ThebombzenAPI itself.
+	 */
+	private static MetaConfiguration configuration = null;
 	//private static Map<ThebombzenAPIBaseMod, Map<Integer, Boolean>> keysPreviouslyDown = new HashMap<ThebombzenAPIBaseMod, Map<Integer, Boolean>>(); 
 
 	/**
