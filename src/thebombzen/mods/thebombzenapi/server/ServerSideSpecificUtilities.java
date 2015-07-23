@@ -2,6 +2,8 @@ package thebombzen.mods.thebombzenapi.server;
 
 import java.io.File;
 
+import net.minecraft.network.rcon.RConConsoleSource;
+import net.minecraft.util.IChatComponent;
 import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
 import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -33,5 +35,10 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 	}
 	
 	
+
+	@Override
+	public void addMessageToOwner(IChatComponent chatComponent) {
+		RConConsoleSource.getInstance().addChatMessage(chatComponent);
+	}
 
 }
