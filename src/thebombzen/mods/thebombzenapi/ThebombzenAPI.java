@@ -138,10 +138,21 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return true;
 	}
 	
+	/**
+	 * Counts the occurrences of a particular character in a particular string.
+	 * @param s The string to check
+	 * @param c The character to count
+	 * @return The number of occurrences of the character
+	 */
 	public static int countOccurrences(String s, char c){
 		return s.length() - s.replace(Character.toString(c), "").length();
 	}
 	
+	/**
+	 * Get the "extended key index" of a particular keyboard key or mouse button name.
+	 * @param name The name of the key or button.
+	 * @return The key index if name is a key. Otherwise, -100 plus the mouse button index.
+	 */
 	public static int getExtendedKeyIndex(String name){
 		int index = Mouse.getButtonIndex(name);
 		if (index == -1){
@@ -210,6 +221,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
 	 * Checks to see if the current world is a freshly loaded world.
+	 * Uses the Identity HashCode as the metric for "new."
 	 */
 	@SideOnly(Side.CLIENT)
 	public static boolean hasWorldChanged(){
@@ -333,15 +345,16 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * @return true if methodName is on the method stack, false otherwise.
 	 */
 	public static boolean isCurrentlyExecutingMethod(String classname, String methodName) {
-		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-		for (StackTraceElement element : trace) {
-			if (element.getClassName().equals(classname) && element.getMethodName().equals(methodName)) {
-				return true;
-			}
-		}
-		return false;
+		return isCurrentlyExecutingMethodRepeatedly(classname, methodName, 1);
 	}
 	
+	/**
+	 * Determines whether a method name is currently being executed at least n times. (That is, on the method stack.)
+	 * This is useful for detecting infinite loops while debugging and not much else.
+	 * 
+	 * @param methodName
+	 * @return true if methodName is on the method stack, false otherwise.
+	 */
 	public static boolean isCurrentlyExecutingMethodRepeatedly(String classname, String methodName, int n) {
 		if (n < 0){
 			return false;
@@ -360,10 +373,23 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return false;
 	}
 	
+	/**
+	 * Checks to see whether the "extended key" with the given name is down.
+	 * "Exentended Key" is a keyboard key or a mouse button.
+	 * @param name The name of the key or mouse button.
+	 * @return Whether or not it is currently down.
+	 */
 	public static boolean isExtendedKeyDown(String name){
 		return isExtendedKeyDown(getExtendedKeyIndex(name));
 	}
 	
+	/**
+	 * Checks whether the extended key with the given key index is down.
+	 * If the index is negative then it checks for the mouse button at 100 + index.
+	 * Otherwise it checks the keyboard key at index.
+	 * @param index The extended key index to check.
+	 * @return Whether or not it is currently down.
+	 */
 	public static boolean isExtendedKeyDown(int index){
 		if (index < 0){
 			return Mouse.isButtonDown(index + 100);
@@ -372,6 +398,15 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 	}
 	
+	/**
+	 * Checks whether or not the separator at the provided index is a top-level separator.
+	 * That is, whether or not the separator is inside the middle of parentheses.
+	 * The separator itself isn't checked, which means that if it's a parenthesis,
+	 * you could get the wrong answer.
+	 * @param info The string to parse
+	 * @param index The index of the separator.
+	 * @return True iff the separator is at the top level (that is, not inside parentheses)
+	 */
 	public static boolean isSeparatorAtTopLevel(String info, int index){
 		String before = info.substring(0, index);
 		String after = info.substring(index + 1);
@@ -394,6 +429,11 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return prevWorld == 0;
 	}
 
+	/**
+	 * Custom, more generous parseBoolean method. Strips whitespace and has more options.
+	 * @param The string to parse.
+	 * @return True iff the given string is "true", "yes", "on", or "y" and false otherwise.
+	 */
 	public static boolean parseBoolean(String s){
 		String c = s.toLowerCase().replaceAll("\\s", "");
 		return c.equals("true") || c.equals("yes") || c.equals("on") || c.equals("y");
