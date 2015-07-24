@@ -2,8 +2,11 @@ package thebombzen.mods.thebombzenapi.server;
 
 import java.io.File;
 
-import net.minecraft.network.rcon.RConConsoleSource;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.IChatComponent;
+
+import org.apache.logging.log4j.LogManager;
+
 import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
 import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -38,7 +41,7 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 
 	@Override
 	public void addMessageToOwner(IChatComponent chatComponent) {
-		RConConsoleSource.getInstance().addChatMessage(chatComponent);
+		LogManager.getLogger(DedicatedServer.class).info(chatComponent.getUnformattedText());
 	}
 
 }

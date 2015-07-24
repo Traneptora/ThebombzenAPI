@@ -563,9 +563,43 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	@SideOnly(Side.SERVER)
 	@EventHandler
+<<<<<<< HEAD
 	private void serverStarted(FMLServerStartedEvent event){
 		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
 			sendUpdateReminders();
+=======
+	public void serverStarted(FMLServerStartedEvent event){
+		sendUpdateReminders();
+	}
+	
+	/**
+	 * Handle server-side tick events.
+	 * Currently only affects reloading the configurations.
+	 * @param event
+	 */
+	@SideOnly(Side.SERVER)
+	@SubscribeEvent
+	public void serverTick(ServerTickEvent event){
+		if (!event.phase.equals(Phase.START)){
+			return;
+		}
+		reloadPropertiesIfChanged();
+	}
+	
+	/**
+	 * Reload the properties files for all the mods, provided that they've changed.
+	 */
+	private void reloadPropertiesIfChanged(){
+		for (ThebombzenAPIBaseMod mod : mods) {
+			try {
+				boolean did = mod.getConfiguration().reloadPropertiesFromFileIfChanged();
+				if (did){
+					sideSpecificUtilities.addMessageToOwner(new ChatComponentText("Reloaded " + mod.getLongName() + " configuration."));
+				}
+			} catch (IOException ioe) {
+				mod.throwException("Could not read properties!", ioe, false);
+			}
+>>>>>>> 75fdc46... Fixed update reminders on the server
 		}
 	}
 
@@ -658,7 +692,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
 	}
 
-	public static void handleToggles(){
+	private void handleToggles(){
 		for (ThebombzenAPIBaseMod mod : mods){
 			int num = mod.getNumToggleKeys();
 			for (int i = 0; i < num; i++){
