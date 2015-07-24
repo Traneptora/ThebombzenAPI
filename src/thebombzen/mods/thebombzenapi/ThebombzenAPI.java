@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -37,6 +38,8 @@ import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
 import cpw.mods.fml.common.gameevent.InputEvent.MouseInputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -97,6 +100,14 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	private static MetaConfiguration configuration = null;
 	//private static Map<ThebombzenAPIBaseMod, Map<Integer, Boolean>> keysPreviouslyDown = new HashMap<ThebombzenAPIBaseMod, Map<Integer, Boolean>>(); 
 
+	/**
+	 * Do not reject vanilla clients or vanilla servers.
+	 */
+	@NetworkCheckHandler
+	public boolean checkNetwork(Map<String, String> modsList, Side remote){
+		return true;
+	}
+	
 	/**
 	 * Detects whether two collections of ItemStack contain
 	 * the same items. It depends on multiplicity, but doesn't depend on order.
@@ -563,11 +574,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	@SideOnly(Side.SERVER)
 	@EventHandler
-<<<<<<< HEAD
-	private void serverStarted(FMLServerStartedEvent event){
-		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
-			sendUpdateReminders();
-=======
 	public void serverStarted(FMLServerStartedEvent event){
 		sendUpdateReminders();
 	}
@@ -599,7 +605,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			} catch (IOException ioe) {
 				mod.throwException("Could not read properties!", ioe, false);
 			}
->>>>>>> 75fdc46... Fixed update reminders on the server
 		}
 	}
 
