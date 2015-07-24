@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,6 +35,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.MouseInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -97,6 +99,14 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	private static MetaConfiguration configuration = null;
 	//private static Map<ThebombzenAPIBaseMod, Map<Integer, Boolean>> keysPreviouslyDown = new HashMap<ThebombzenAPIBaseMod, Map<Integer, Boolean>>(); 
 
+	/**
+	 * Do not reject vanilla clients or vanilla servers.
+	 */
+	@NetworkCheckHandler
+	public boolean checkNetwork(Map<String, String> modsList, Side remote){
+		return true;
+	}
+	
 	/**
 	 * Detects whether two collections of ItemStack contain
 	 * the same items. It depends on multiplicity, but doesn't depend on order.
