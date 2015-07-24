@@ -572,7 +572,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@SideOnly(Side.SERVER)
 	@EventHandler
-	private void serverStarted(FMLServerStartedEvent event){
+	public void serverStarted(FMLServerStartedEvent event){
 		sendUpdateReminders();
 	}
 	
@@ -686,7 +686,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
 	}
 
-	public static void handleToggles(){
+	private void handleToggles(){
 		for (ThebombzenAPIBaseMod mod : mods){
 			int num = mod.getNumToggleKeys();
 			for (int i = 0; i < num; i++){
