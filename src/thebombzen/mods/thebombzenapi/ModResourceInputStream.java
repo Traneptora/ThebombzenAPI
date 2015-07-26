@@ -7,10 +7,25 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * This InputStream class reads from a given mod resource location.
+ * If the mod is in a directory on the filesystem, this will read the resource in that directory.
+ * If the mod is a jar file, this will extract the resource from the Jar and read that.
+ * @author thebombzen
+ */
 public class ModResourceInputStream extends FilterInputStream {
 	
+	/**
+	 * This is the ZipFile we read from if the resource is a zip file.
+	 */
 	private ZipFile zipFile;
 	
+	/**
+	 * Construct a ModResourceInputStream given the location and name of a resource.
+	 * @param location The location of the resource, either a directory or a zip file.
+	 * @param resource The name of the resource, with a proceeding '/'. 
+	 * @throws IOException In the case of an I/O Error.
+	 */
 	public ModResourceInputStream(File location, String resource) throws IOException {
 		super(null);
 		if (location.isDirectory()){

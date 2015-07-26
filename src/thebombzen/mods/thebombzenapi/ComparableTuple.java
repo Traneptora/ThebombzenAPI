@@ -46,16 +46,32 @@ public class ComparableTuple<T extends Comparable<T>> implements Comparable<Comp
 		return true;
 	}
 
+	/**
+	 * This list contains the underlying elements.
+	 * Despite being in a mutable container, it's never changed. 
+	 */
 	private List<T> elements = new ArrayList<T>();
 	
+	/**
+	 * Construct a ComparableTuple from several elements.
+	 * @param elements The elements comprising this tuple.
+	 */
 	public ComparableTuple(T... elements){
 		this.elements.addAll(Arrays.asList(elements));
 	}
 	
+	/**
+	 * Returns the number of elements in the tuple.
+	 */
 	public int getSize(){
 		return elements.size();
 	}
 	
+	/**
+	 * Returns the element at the specified index in the tuple.
+	 * @param index An integer between 0 and size, inclusive/exclusive
+	 * @throws IndexOutOfBoundsException if the index is not between 0 and size, i/e.
+	 */
 	public T get(int index){
 		return elements.get(index);
 	}

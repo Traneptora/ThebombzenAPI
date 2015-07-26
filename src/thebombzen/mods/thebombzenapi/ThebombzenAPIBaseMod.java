@@ -28,7 +28,9 @@ import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 /**
  * This class is the superclass of Thebombzen's mods. Extend this to get
  * ThebombzenAPI functionality. I'm using inheritance because it's practical,
- * because FML doesn't require inheritance.
+ * and because FML doesn't require inheriting any particular class.
+ * 
+ * This implements Comparable so it can be sorted in alphabetical order by a SortedSet.
  * 
  * You still need a Mod annotation on your mod. This will not load your mod for you.
  * @author thebombzen
@@ -42,7 +44,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	protected int[] toggleKeyCodes;
 
 	/**
-	 * Array of boolean values to be toggled.
+	 * Array of boolean values to be toggled by the toggle keys.
 	 */
 	@SideOnly(Side.CLIENT)
 	protected boolean[] toggles;
@@ -69,11 +71,13 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	protected StringBuilder debugBuilder = null;
 
 	/**
-	 * This contains the previous debug String, to avoid printing exactly the
-	 * same thing repeatedly.
+	 * This contains the previous contents of the debugging StringBuilder, used to avoid repeats.
 	 */
 	protected String prevDebugString = "";
 	
+	/**
+	 * This contains the previous line of the debugging output, used to avoid repeats.
+	 */
 	protected String prevImmediateDebugString = "";
 
 	/**
@@ -105,7 +109,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 
 	/**
 	 * Writes the string to the debug logger, without checking if debug is
-	 * enabled.
+	 * enabled. Used for runtime errors.
 	 * 
 	 * @param string
 	 *            The {String} to write.
@@ -116,7 +120,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 
 	/**
 	 * Writes the debug info to the debug logger, without checking if debug is
-	 * enabled. Uses {String.format} syntax.
+	 * enabled. Uses {String.format} syntax. Used for runtime errors.
 	 * 
 	 * @param format
 	 *            The string format
@@ -155,6 +159,11 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 	}
 
+	/**
+	 * Debugs an exception to the debug logger (and to System.err)
+	 * without checking whether or not debug is enabled. Used for runtime errors.
+	 * @param exception
+	 */
 	public void forceDebugException(Throwable exception){
 		exception.printStackTrace();
 		if (debugLogger != null) {
@@ -164,7 +173,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Gets an {NBTTagCompound} containing the current toggle data.
+	 * Gets an NBTTagCompound containing the current toggle data.
 	 */
 	@SideOnly(Side.CLIENT)
 	public NBTTagCompound getCompoundFromCurrentData() {
@@ -181,7 +190,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Gets an {NBTTagCompound} containing the default toggle data.
+	 * Gets an NBTTagCompound containing the default toggle data.
 	 */
 	@SideOnly(Side.CLIENT)
 	public NBTTagCompound getCompoundFromDefaultData() {
@@ -199,6 +208,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 
 	/**
 	 * Gets the configuration for this mod.
+	 * Mods need to create their own implementation of ThebombzenAPIConfiguration.
 	 */
 	public abstract <T extends ThebombzenAPIConfiguration> T getConfiguration();
 
@@ -227,12 +237,17 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 	}
 
+	/**
+	 * This is a String containing the URL of the download location.
+	 * This is not a direct download location but rather a URL to display to the user
+	 * so he or she can go and download an update manually. 
+	 */
 	public abstract String getDownloadLocationURLString();
 
 	/**
-	 * Fetches the latest version of the mod a file on the interwebs.
-	 * 
-	 * @return
+	 * Fetches the latest version of the mod from a file on the interwebs,
+	 * in order to be compared to the current version.
+	 * @return the version String of the latest version
 	 */
 	public String getLatestVersion() {
 		String latestVersion = null;
@@ -255,6 +270,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 
 	/**
 	 * Gets the long version String of the mod.
+	 * This is usually of the form "Mod, version #, Minecraft #"
 	 */
 	public abstract String getLongVersionString();
 
@@ -272,13 +288,15 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	public abstract int getNumToggleKeys();
 
 	/**
-	 * Gets a mod abbreviation, e.g. TBZAPI
+	 * Gets the acronym for the mod name, usually two to six characters in all caps,
+	 * like AS, WAGT, or TBZAPI.
 	 */
 	public abstract String getShortName();
 
 	/**
-	 * Returns the keycode for the toggle at the specified index.
-	 * 
+	 * Returns the extended keycode for the toggle at the specified index.
+	 * @throws UnsupportedOperationException if there aren't any toggle keys
+	 * @throws IndexOutOfBoundsException if the index isn't between 0 and numToggles, i/e.
 	 */
 	@SideOnly(Side.CLIENT)
 	public int getToggleKeyCode(int index) {
@@ -292,55 +310,67 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Gets the message printed to the user when a toggle is changed. e.g.
+	 * Gets the message printed to the user when a toggle is changed by him or her. e.g.
 	 * "Such and such toggle is enabled."
 	 * 
 	 * @param index
 	 *            index of the toggle
 	 * @param enabled
-	 *            Whether or not the toggle was just enabled
+	 *            true if the toggle was just enabled, false if it was just disabled.
 	 */
 	@SideOnly(Side.CLIENT)
 	protected abstract String getToggleMessageString(int index, boolean enabled);
 
 	/**
-	 * Returns a URL pointing toward the current version file.
+	 * Returns a URL pointing toward the current version file. This is the same URL
+	 * given by getVersionFileURLString().
 	 */
 	public URL getVersionFileURL() throws MalformedURLException {
 		return new URL(getVersionFileURLString());
 	}
 	
 	/**
-	 * Returns a String containing a URL pointing toward the current version
-	 * file.
+	 * Returns a URL pointing toward a version file, which is a file
+	 * that contains a version String as its first line. The version file
+	 * this retrieves should have the latest version as its first line.
 	 */
 	protected abstract String getVersionFileURLString();
 
 	/**
-	 * Equivalent of preInit. The config is not loaded during preInit, careful!
+	 * This is the equivalent of preInit, but handled by ThebombzenAPI.
+	 * During the init1 phase, the configuration is not loaded from the disk.
+	 * Override it to make it do something.
+	 * @param event the event passed to ThebombzenAPI by FML.
 	 */
 	public void init1(FMLPreInitializationEvent event) {
 		
 	}
 
 	/**
-	 * Equivalent of load.
+	 * This is the equivalent of load, but handled by ThebombzenAPI.
+	 * The configuration is loaded between init1 and init2 and it
+	 * should be loaded from the disk here.
+	 * Override it to make it do something.
+	 * @param event the event passed to ThebombzenAPI by FML.
 	 */
 	public void init2(FMLInitializationEvent event) {
 		
 	}
 
 	/**
-	 * Equivalent of postInit.
+	 * This is the equivalent of postInit, but handled by ThebombzenAPI.
+	 * Override it to make it do something.
+	 * @param event the event passed to ThebombzenAPI by FML.
 	 */
 	public void init3(FMLPostInitializationEvent event) {
 
 	}
 
 	/**
-	 * This is the init routine. It is separate from the constructor because
-	 * it crashes if this mod is in fact ThebombzenAPI.
-	 * It should only be called independently by ThebombzenAPI itself.
+	 * This is the initialization routine.
+	 * This is code that would be contained in the constructor but FML whines that
+	 * no code should be executed during mod construction.
+	 * ThebombzenAPI handles it all before init1.
 	 */
 	void initialize(){
 		
@@ -365,12 +395,14 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Determines if the toggle is "default enabled," or will enable on unknown
-	 * worlds/servers.
+	 * Determines if the toggle is "default enabled." A toggle is "default enabled" if
+	 * it will default to "enabled" on new worlds and unvisited servers.
 	 * 
 	 * @param index
 	 *            The index of the toggle
-	 * @return true if so, false otherwise
+	 * @return true if it is "default enabled," false otherwise.
+	 * @throws IndexOutOfBoundsException if index isn't between 0 and numToggles, i/e.
+	 * @throws UnsupportedOperationException if there are no toggles
 	 */
 	@SideOnly(Side.CLIENT)
 	public boolean isToggleDefaultEnabled(int index) {
@@ -384,11 +416,13 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Determines if the toggle is enabled.
+	 * Determines if the toggle is currently enabled.
 	 * 
 	 * @param index
 	 *            The index of the toggle.
-	 * @return true if so, false otherwise
+	 * @return true if it is currently enabled, false if it is currently disabled.
+	 * @throws IndexOutOfBoundsException if index isn't between 0 and numToggles, i/e.
+	 * @throws UnsupportedOperationException if there are no toggles
 	 */
 	@SideOnly(Side.CLIENT)
 	public boolean isToggleEnabled(int index) {
@@ -403,7 +437,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	
 	
 	/**
-	 * Load memory data from the correct memory file.
+	 * Load the saved data (currently only toggles) from the correct memory file.
 	 */
 	@SideOnly(Side.CLIENT)
 	public void readFromCorrectMemoryFile() {
@@ -416,10 +450,10 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	
 	/**
 	 * Read and return memory data from the specified file.
-	 * config
+	 * Currently the only memory data is toggles.
 	 * @param file
 	 *            The file to read from
-	 * @return The NBTTagCompound containing the read data.
+	 * @return The NBTTagCompound containing the data that was read.
 	 */
 	@SideOnly(Side.CLIENT)
 	public NBTTagCompound readFromMemoryFile(File file) {
@@ -445,10 +479,12 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Sae the data compound to the current mod state.
+	 * This method takes the data from the NBTTagCompound and changes the mod
+	 * state to match the data in the compound. It loads the data from the compound
+	 * into the mod state.
 	 * 
 	 * @param data
-	 *            The data compound to use
+	 *            The data compound to load from
 	 */
 	@SideOnly(Side.CLIENT)
 	public void saveCompoundToCurrentData(NBTTagCompound data) {
@@ -469,13 +505,14 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Sets the "default enabled" status of the toggle, which determines whether
-	 * to enable it on unknown worlds.
+	 * Sets the "default enabled" status of a toggle. A toggle is "default enabled" if
+	 * it will default to "enabled" on new worlds and unvisited servers.
 	 * 
 	 * @param index
-	 *            The index of the toggle.
-	 * @param enabled
-	 *            true to enable, false to disable
+	 *            The index of the toggle
+	 * @param enabled true to set it to "default enabled", false to turn off "default enabled"
+	 * @throws IndexOutOfBoundsException if index isn't between 0 and numToggles, i/e.
+	 * @throws UnsupportedOperationException if there are no toggles
 	 */
 	@SideOnly(Side.CLIENT)
 	public void setToggleDefaultEnabled(int index, boolean enabled) {
@@ -492,11 +529,11 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * Sets the status of the toggle.
 	 * 
 	 * @param index
-	 *            The index of the toggle.
+	 *            The index of the toggle
 	 * @param enabled
 	 *            true to enable, false to disable
 	 * @param keyPress
-	 *            true if this change was initiated by a keypress, or false if
+	 *            true if this change was initiated by an extended keypress, or false if
 	 *            not. If true, the toggle message will print to the user's GUI.
 	 */
 	@SideOnly(Side.CLIENT)
@@ -515,12 +552,12 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	}
 
 	/**
-	 * Sets the keycode used to change the toggle.
+	 * Sets the extended keycode used to change the toggle. An extended keycode is either a mouse button or a keyboard key.
 	 * 
 	 * @param index
 	 *            The index of the toggle
 	 * @param keyCode
-	 *            The keycode to toggle
+	 *            The extended keycode used to change the toggle at the specified index.
 	 */
 	@SideOnly(Side.CLIENT)
 	public void setToggleKeyCode(int index, int keyCode) {
@@ -540,7 +577,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * @param info
 	 *            String indicating a short amount of info about the Exception.
 	 * @param exception
-	 *            The {Throwable} to throw.
+	 *            The Throwable to throw.
 	 * @param fatal
 	 *            if true, crash the client. If false, only log the exception.
 	 */
@@ -573,9 +610,9 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * Writes the given memory data compound to the given file.
 	 * 
 	 * @param file
-	 *            The {java.io.File} to write to.
+	 *            The File to write to.
 	 * @param config
-	 *            The {NBTTagCompound} to write.
+	 *            The NBTTagCompound to write.
 	 */
 	@SideOnly(Side.CLIENT)
 	public void writeToMemoryFile(File file, NBTTagCompound config) {

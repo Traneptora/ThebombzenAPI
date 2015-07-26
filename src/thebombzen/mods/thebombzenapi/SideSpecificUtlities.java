@@ -20,6 +20,8 @@ public interface SideSpecificUtlities {
 
 	/**
 	 * Get the base minecraft directory.
+	 * On the client this is the standard Minecraft directory.
+	 * On the server this is the base directory of the server.
 	 */
 	public File getMinecraftDirectory();
 	
@@ -29,12 +31,13 @@ public interface SideSpecificUtlities {
 	 * (this instanceof ClientSideSpecificUtilities) crashes the server
 	 * with ClassNotFoundException caused by NoClassDefFoundError
 	 * 
-	 * @return true if this is the client, false if this is the server;
+	 * @return true if this is the client, false if this is the server
 	 */
 	public boolean isClient();
 	
 	/**
 	 * Print a message to the owner. This is the singleplayer user on a client and the server console on the server.
+	 * The text is printed unformatted to the server and formatted to the client.
 	 * @param chatComponent The chat component to send
 	 */
 	public void addMessageToOwner(IChatComponent chatComponent);

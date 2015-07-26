@@ -96,11 +96,11 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * The configuration for ThebombzenAPI itself.
 	 */
-	private static MetaConfiguration configuration = null;
-	//private static Map<ThebombzenAPIBaseMod, Map<Integer, Boolean>> keysPreviouslyDown = new HashMap<ThebombzenAPIBaseMod, Map<Integer, Boolean>>(); 
+	private static MetaConfiguration configuration = null; 
 
 	/**
-	 * Do not reject vanilla clients or vanilla servers.
+	 * checkNetwork accepts or rejects the mod list of the client or the server.
+	 * ThebombzenAPI will always accept the mod list because it does require itself to be on either side.
 	 */
 	@NetworkCheckHandler
 	public boolean checkNetwork(Map<String, String> modsList, Side remote){
@@ -233,6 +233,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Checks to see if the current world is a freshly loaded world.
 	 * Uses the Identity HashCode as the metric for "new."
+	 * @return true for the entire first tick of the new world and false otherwise.
 	 */
 	@SideOnly(Side.CLIENT)
 	public static boolean hasWorldChanged(){
@@ -351,20 +352,18 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Determines whether a method name is currently being executed. (That is,
 	 * on the method stack.) This is useful for debugging and not much else.
-	 * 
-	 * @param methodName
-	 * @return true if methodName is on the method stack, false otherwise.
+	 * @param methodName The name of the method to check
+	 * @return true if methodName is on the call stack, false otherwise.
 	 */
 	public static boolean isCurrentlyExecutingMethod(String classname, String methodName) {
 		return isCurrentlyExecutingMethodRepeatedly(classname, methodName, 1);
 	}
 	
 	/**
-	 * Determines whether a method name is currently being executed at least n times. (That is, on the method stack.)
+	 * Determines whether a method name is currently being executed at least n times. (That is, on the call stack.)
 	 * This is useful for detecting infinite loops while debugging and not much else.
-	 * 
-	 * @param methodName
-	 * @return true if methodName is on the method stack, false otherwise.
+	 * @param methodName The name of the method to check
+	 * @return true if methodName is on the call stack at least n times, false otherwise.
 	 */
 	public static boolean isCurrentlyExecutingMethodRepeatedly(String classname, String methodName, int n) {
 		if (n < 0){
@@ -387,8 +386,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Checks to see whether the "extended key" with the given name is down.
 	 * "Exentended Key" is a keyboard key or a mouse button.
-	 * @param name The name of the key or mouse button.
-	 * @return Whether or not it is currently down.
+	 * @param name The name of the key or mouse button
+	 * @return true if and only if it is currently down
 	 */
 	public static boolean isExtendedKeyDown(String name){
 		return isExtendedKeyDown(getExtendedKeyIndex(name));
@@ -398,8 +397,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * Checks whether the extended key with the given key index is down.
 	 * If the index is negative then it checks for the mouse button at 100 + index.
 	 * Otherwise it checks the keyboard key at index.
-	 * @param index The extended key index to check.
-	 * @return Whether or not it is currently down.
+	 * @param index The extended key index to check
+	 * @return true if and only if it is currently down
 	 */
 	public static boolean isExtendedKeyDown(int index){
 		if (index < 0){
@@ -416,7 +415,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * you could get the wrong answer.
 	 * @param info The string to parse
 	 * @param index The index of the separator.
-	 * @return True iff the separator is at the top level (that is, not inside parentheses)
+	 * @return true if and only if the separator is at the top level (that is, not inside parentheses)
 	 */
 	public static boolean isSeparatorAtTopLevel(String info, int index){
 		String before = info.substring(0, index);
@@ -430,7 +429,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
 	 * Checks to see if the current world is a freshly loaded world and is the first world loaded.
-	 * @return
+	 * @return true if is the first game tick of the first loaded world on the client, and false otherwise 
 	 */
 	@SideOnly(Side.CLIENT)
 	public static boolean isWorldFirstLoadedWorld(){
@@ -442,8 +441,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
 	 * Custom, more generous parseBoolean method. Strips whitespace and has more options.
-	 * @param The string to parse.
-	 * @return True iff the given string is "true", "yes", "on", or "y" and false otherwise.
+	 * @param s The string to parse
+	 * @return true if and only if the given string is "true", "yes", "on", or "y" and false otherwise.
 	 */
 	public static boolean parseBoolean(String s){
 		String c = s.toLowerCase().replaceAll("\\s", "");
@@ -457,7 +456,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * Negatives will only be parsed if the - sign comes BEFORE the 0x/0b/0.
 	 * @param The string to parse
 	 * @return The integer value
-	 * @throws NumberFormatException if the number is invalid.
+	 * @throws NumberFormatException if the number is invalid
 	 */
 	public static int parseInteger(String s) throws NumberFormatException {
 		s = s.replace("_", "");
@@ -519,10 +518,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static void registerMod(ThebombzenAPIBaseMod mod) {
 		mods.add(mod);
-		//keysPreviouslyDown.put(mod, new HashMap<Integer, Boolean>());
-		//for (int i = 0; i < mod.getNumToggleKeys(); i++){
-		//	keysPreviouslyDown.get(mod).put(i, false);
-		//}
 	}
 	
 	
@@ -563,6 +558,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	/**
 	 * Send update reminders about the most recent version of the mods.
+	 * Verifies that the Update Reminders option is enabled before checking.
+	 * This method will not actually check for updates if Update Reminders is disabled.
 	 */
 	private void sendUpdateReminders(){
 		if (this.getConfiguration().getBooleanProperty(MetaConfiguration.UPDATE_REMINDERS)){
@@ -577,7 +574,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	}
 	
 	/**
-	 * Handle events on server-start on the serverside.
+	 * Handle events on server-start on the server side.
 	 * Currently affects update reminders only.
 	 */
 	@SideOnly(Side.SERVER)
@@ -589,7 +586,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Handle server-side tick events.
 	 * Currently only affects reloading the configurations.
-	 * @param event
+	 * @param event the ServerTickEvent that Forge passes
 	 */
 	@SideOnly(Side.SERVER)
 	@SubscribeEvent
@@ -602,6 +599,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	/**
 	 * Reload the properties files for all the mods, provided that they've changed.
+	 * Changed is done using the last modified date on the filesystem.
 	 */
 	private void reloadPropertiesIfChanged(){
 		for (ThebombzenAPIBaseMod mod : mods) {
@@ -620,7 +618,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 * Main client tick loop.
 	 * 
 	 * @param tickEvent
-	 *            the ClientTickEvent that forge passes.
+	 *            the ClientTickEvent that forge passes
 	 */
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
@@ -696,6 +694,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return "https://dl.dropboxusercontent.com/u/51080973/Mods/ThebombzenAPI/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
 	}
 
+	/**
+	 * Enable or disable the toggle keys associated with each mod, according to whether or not they have been pressed.
+	 */
 	private void handleToggles(){
 		for (ThebombzenAPIBaseMod mod : mods){
 			int num = mod.getNumToggleKeys();
@@ -710,11 +711,19 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 	}
 	
+	/**
+	 * This event handler causes toggles to be handled rather than every tick.
+	 * @param event the KeyInputEvent passed by Forge
+	 */
 	@SubscribeEvent
 	public void handleMouseClick(MouseInputEvent event){
 		handleToggles();
 	}
 	
+	/**
+	 * This event handler causes toggles to be handled rather than every tick.
+	 * @param event the KeyInputEvent passed by Forge
+	 */
 	@SubscribeEvent
 	public void handleKeyPress(KeyInputEvent event){
 		handleToggles();
@@ -722,8 +731,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
 	 * FML load method. Does load stuff and calls init2 of the mods. Also loads the configuration of all the mods.
-	 * 
-	 * @param event
 	 */
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
@@ -739,8 +746,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	/**
 	 * FML postInit method. Does postInit stuff and calls init3 of the mods.
-	 * 
-	 * @param event
 	 */
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
@@ -751,8 +756,6 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	/**
 	 * FML preInitMethod. Does preInit stuff and calls init1 of the mods. Note that in the init1 state the configuration is not loaded.
-	 * 
-	 * @param event
 	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -771,7 +774,9 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			mod.init1(event);
 		}
 	}
-
+	/**
+	 * Refreshes the hasStart calculation upon loading a new world.
+	 */
 	@SubscribeEvent
 	public void worldLoaded(WorldEvent.Load event){
 		if (event.world.isRemote){
