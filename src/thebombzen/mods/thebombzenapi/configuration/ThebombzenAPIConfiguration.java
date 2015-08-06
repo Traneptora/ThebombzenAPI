@@ -170,6 +170,7 @@ public abstract class ThebombzenAPIConfiguration {
 	 */
 	protected void loadProperties() throws IOException {
 		if (!propsFile.exists()) {
+			propsFile.getParentFile().mkdirs();
 			propsFile.createNewFile();
 		}
 		Reader reader = new BufferedReader(new FileReader(propsFile));
