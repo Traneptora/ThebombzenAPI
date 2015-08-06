@@ -3,9 +3,9 @@
   "modid": "thebombzenapi",
   "name": "ThebombzenAPI",
   "description": "ThebombzenAPI provides common code among Thebombzen's mods.",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "credits": "Thebombzen",
-  "mcversion": "1.7.2",
+  "mcversion": "1.7.10",
   "url": "http://is.gd/ThebombzensMods#ThebombzenAPI"
 }
 ]
