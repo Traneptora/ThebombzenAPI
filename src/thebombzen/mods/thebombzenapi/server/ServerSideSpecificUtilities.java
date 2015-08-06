@@ -18,7 +18,7 @@ public class ServerSideSpecificUtilities implements SideSpecificUtlities {
 
 	@Override
 	public void crash(String info, Throwable e) {
-		FMLCommonHandler.instance().exitJava(1, true);
+		FMLCommonHandler.instance().exitJava(1, false);
 	}
 
 	@Override
