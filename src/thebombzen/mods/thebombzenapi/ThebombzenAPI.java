@@ -23,6 +23,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -656,10 +657,17 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		initialize();
 		FMLCommonHandler.instance().bus().register(this);
 		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
 		dummyConfig = new MetaConfiguration();
+		for (Object mod : Loader.instance().getReversedModObjectList().keySet()){
+			if (mod instanceof ThebombzenAPIBaseMod) {
+				mods.add((ThebombzenAPIBaseMod) mod);
+			}
+		}
+		for (ThebombzenAPIBaseMod mod : mods){
+			mod.initialize();
+		}
 		for (ThebombzenAPIBaseMod mod : mods){
 			mod.init1(event);
 		}

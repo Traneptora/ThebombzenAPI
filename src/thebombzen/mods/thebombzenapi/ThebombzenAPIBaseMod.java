@@ -81,17 +81,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	protected File debugFile;
 
-	/**
-	 * This is the standard constructor. By using a constructor routine
-	 * rather than preInit/load/postInit we don't need method stubs in the classes
-	 * that extend this one.
-	 */
-	public ThebombzenAPIBaseMod(){
-		if (!ThebombzenAPI.class.isAssignableFrom(getClass())){
-			initialize();
-		}
-	}
-	
 	@Override
 	public int compareTo(ThebombzenAPIBaseMod mod){
 		if (this == mod){
@@ -360,8 +349,6 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			toggles = new boolean[getNumToggleKeys()];
 			defaultToggles = new boolean[getNumToggleKeys()];
 		}
-
-		ThebombzenAPI.registerMod(this);
 
 		File mineFile = ThebombzenAPI.sideSpecificUtilities.getMinecraftDirectory();
 		File modsFolder = new File(mineFile, "mods");
