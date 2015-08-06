@@ -1,7 +1,7 @@
 #!/bin/sh
 
-VERS=2.5.0
-MC_VERS=1.8
+VERS=2.4.2
+MC_VERS=1.7.10
 
 cd $(dirname $0)
 ARCH=ThebombzenAPI-v$VERS-mc$MC_VERS.jar
@@ -15,5 +15,4 @@ Main-Class: thebombzen.mods.thebombzenapi.installer.APIInstallerFrame
 EOF
 
 zip -u $ARCH META-INF/MANIFEST.MF
-
 
