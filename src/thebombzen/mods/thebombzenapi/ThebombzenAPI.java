@@ -567,7 +567,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	@SuppressWarnings("unchecked")
 	@Override
 	public MetaConfiguration getConfiguration() {
-		return dummyConfig;
+		return configuration;
 	}
 
 	@Override
@@ -667,7 +667,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	public void preInit(FMLPreInitializationEvent event) {
 		FMLCommonHandler.instance().bus().register(this);
 		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
-		dummyConfig = new MetaConfiguration();
+		configuration = new MetaConfiguration();
 		for (Object mod : Loader.instance().getReversedModObjectList().keySet()){
 			if (mod instanceof ThebombzenAPIBaseMod) {
 				mods.add((ThebombzenAPIBaseMod) mod);
