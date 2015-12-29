@@ -18,6 +18,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -242,6 +244,24 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		}
 		int currWorld = System.identityHashCode(Minecraft.getMinecraft().theWorld);
 		return currWorld != prevWorld;
+	}
+	
+	/**
+	 * Sometimes the client-side world loads before the integrated server.
+	 * This tests to see if the integrated server world has actually loaded.
+	 * @return true if the player's current dimension is loaded on the server and false otherwise
+	 * @throws UnsupportedOperationException if this is not singleplayer
+	 */
+	@SideOnly(Side.CLIENT)
+	public static boolean hasServerWorldLoaded(){
+		if (!Minecraft.getMinecraft().isSingleplayer()){
+			throw new UnsupportedOperationException("Only works for Singleplayer!");
+		}
+		if (Minecraft.getMinecraft().thePlayer == null){
+			return false;
+		}
+		WorldServer world = DimensionManager.getWorld(Minecraft.getMinecraft().thePlayer.dimension);
+		return world != null;
 	}
 
 	/**
@@ -646,6 +666,12 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 		if (hasWorldChanged()) {
 			for (ThebombzenAPIBaseMod mod : mods) {
+				mod.markMemoryDirty();
+			}
+		}
+		
+		for (ThebombzenAPIBaseMod mod : mods){
+			if (mod.isMemoryDirty()){
 				mod.readFromCorrectMemoryFile();
 			}
 		}

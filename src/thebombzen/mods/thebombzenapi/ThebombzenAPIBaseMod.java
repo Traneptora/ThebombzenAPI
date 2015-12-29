@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.storage.SaveHandler;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -84,6 +85,26 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 * Debug output goes to this file.
 	 */
 	protected File debugFile;
+	
+	/**
+	 * If this flag is set to true, then we need to reload the memory from the correct memory file.
+	 */
+	protected boolean dirtyMemoryFlag = true;
+	
+	/**
+	 * Mark the memory for reloading from the memory file. This is useful if the world has changed or just loaded.
+	 */
+	public void markMemoryDirty(){
+		dirtyMemoryFlag = true;
+	}
+	
+	/**
+	 * Returns true if the memory should be reloaded from the memory file
+	 * and false if the memory does not need to be reloaded from the memory file.
+	 */
+	public boolean isMemoryDirty(){
+		return dirtyMemoryFlag;
+	}
 	
 	@Override
 	public int compareTo(ThebombzenAPIBaseMod mod){
@@ -221,13 +242,13 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 			return null;
 		}
 		if (Minecraft.getMinecraft().isSingleplayer()) {
-			return new File(((SaveHandler) Minecraft
-					.getMinecraft()
-					.getIntegratedServer()
-					.worldServerForDimension(
-							Minecraft.getMinecraft().thePlayer.dimension)
-					.getSaveHandler()).getWorldDirectory(), getLongName()
-					.toUpperCase() + "_MEMORY.dat");
+			if (ThebombzenAPI.hasServerWorldLoaded()){
+				return new File(((SaveHandler) DimensionManager.getWorld(Minecraft.getMinecraft().thePlayer.dimension)
+						.getSaveHandler()).getWorldDirectory(),
+						getLongName().toUpperCase() + "_MEMORY.dat");
+			} else {
+				return null;
+			}
 		} else {
 			return new File(getModFolder(),
 					getLongName().toUpperCase()
@@ -445,6 +466,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		if (file != null) {
 			NBTTagCompound data = readFromMemoryFile(file);
 			saveCompoundToCurrentData(data);
+			dirtyMemoryFlag = false;
 		}
 	}
 	
