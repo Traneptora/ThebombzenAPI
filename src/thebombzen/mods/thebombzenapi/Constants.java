@@ -13,5 +13,5 @@ public interface Constants {
 	/**
 	 * The version of Minecraft this was built for.
 	 */
-	public static final String MC_VERSION = "1.8";
+	public static final String MC_VERSION = "1.8.9";
 }
