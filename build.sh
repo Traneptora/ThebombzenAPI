@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-VERS=2.5.2
-MC_VERS=1.8.9
+VERS=2.6.0
+MC_VERS=1.9
 
 cd $(dirname $0)
 ARCH=ThebombzenAPI-v$VERS-mc$MC_VERS.jar
