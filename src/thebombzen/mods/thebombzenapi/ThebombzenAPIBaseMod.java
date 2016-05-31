@@ -15,7 +15,7 @@ import java.net.URL;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -568,7 +568,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		toggles[index] = enabled;
 		if (keyPress) {
-			Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(getToggleMessageString(index, enabled)));
+			Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString(getToggleMessageString(index, enabled)));
 		}
 
 	}

@@ -5,16 +5,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.StatCollector;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
 import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
 import thebombzen.mods.thebombzenapi.configuration.SingleMultiBoolean;
@@ -172,7 +171,6 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 	/**
 	 * Initialize this Gui.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		ConfigOption[] options = config.getAllOptions();
@@ -193,8 +191,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 			tooltipButtons.put(button, option);
 		}
 		buttonList.add(new GuiButton(4912, width / 2 - 100,
-				height / 6 + 168, 200, 20, StatCollector
-						.translateToLocal("gui.done")));
+				height / 6 + 168, 200, 20, I18n.translateToLocal("gui.done")));
 	}
 
 	/**

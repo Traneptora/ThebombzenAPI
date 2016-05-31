@@ -2,7 +2,7 @@ package thebombzen.mods.thebombzenapi;
 
 import java.io.File;
 
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 
 /**
  * This interface provides side-specific functions.
@@ -38,8 +38,8 @@ public interface SideSpecificUtlities {
 	/**
 	 * Print a message to the owner. This is the singleplayer user on a client and the server console on the server.
 	 * The text is printed unformatted to the server and formatted to the client.
-	 * @param chatComponent The chat component to send
+	 * @param textComponent The text component to send
 	 */
-	public void addMessageToOwner(IChatComponent chatComponent);
+	public void addMessageToOwner(ITextComponent textComponent);
 
 }

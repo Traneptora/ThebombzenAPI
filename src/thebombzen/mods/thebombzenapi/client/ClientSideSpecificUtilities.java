@@ -4,7 +4,7 @@ import java.io.File;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
@@ -33,8 +33,8 @@ public class ClientSideSpecificUtilities implements SideSpecificUtlities {
 	}
 
 	@Override
-	public void addMessageToOwner(IChatComponent chatComponent) {
-		Minecraft.getMinecraft().thePlayer.addChatMessage(chatComponent);
+	public void addMessageToOwner(ITextComponent textComponent) {
+		Minecraft.getMinecraft().thePlayer.addChatMessage(textComponent);
 	}
 
 }

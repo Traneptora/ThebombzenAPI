@@ -14,12 +14,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -41,15 +45,12 @@ import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
 /**
  * This is the core of the API and contains many utility functions.
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "thebombzen.mods.thebombzenapi.client.ConfigGuiFactory", acceptedMinecraftVersions = "[1.8, 1.9)")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "thebombzen.mods.thebombzenapi.client.ConfigGuiFactory", acceptedMinecraftVersions = "[1.9, 1.10)")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -586,8 +587,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			for (ThebombzenAPIBaseMod mod : mods) {
 				String latestVersion = mod.getLatestVersion();
 				if (!latestVersion.equals(mod.getLongVersionString())) {
-					sideSpecificUtilities.addMessageToOwner(new ChatComponentText(latestVersion + " is available. "));
-					sideSpecificUtilities.addMessageToOwner(IChatComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",value=\"" + mod.getDownloadLocationURLString() + "\"}}"));
+					sideSpecificUtilities.addMessageToOwner(new TextComponentString(latestVersion + " is available. "));
+					sideSpecificUtilities.addMessageToOwner(ITextComponent.Serializer.jsonToComponent("{\"text\": \"" + mod.getLongName() + ": " + mod.getDownloadLocationURLString() + "\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + mod.getDownloadLocationURLString() + "\"}}"));
 				}
 			}
 		}
@@ -626,7 +627,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			try {
 				boolean did = mod.getConfiguration().reloadPropertiesFromFileIfChanged();
 				if (did){
-					sideSpecificUtilities.addMessageToOwner(new ChatComponentText("Reloaded " + mod.getLongName() + " configuration."));
+					sideSpecificUtilities.addMessageToOwner(new TextComponentString("Reloaded " + mod.getLongName() + " configuration."));
 				}
 			} catch (IOException ioe) {
 				mod.throwException("Could not read properties!", ioe, false);
@@ -785,7 +786,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		FMLCommonHandler.instance().bus().register(this);
+		MinecraftForge.EVENT_BUS.register(this);
 		FMLCommonHandler.instance().findContainerFor(this).getMetadata().authorList = Arrays.asList("Thebombzen");
 		configuration = new MetaConfiguration();
 		for (Object mod : Loader.instance().getReversedModObjectList().keySet()){
@@ -805,7 +806,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@SubscribeEvent
 	public void worldLoaded(WorldEvent.Load event){
-		if (event.world.isRemote){
+		if (event.getWorld().isRemote){
 			hasStart = false;
 		}
 	}
