@@ -11,7 +11,7 @@ import org.lwjgl.input.Mouse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
@@ -191,7 +191,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 			tooltipButtons.put(button, option);
 		}
 		buttonList.add(new GuiButton(4912, width / 2 - 100,
-				height / 6 + 168, 200, 20, I18n.translateToLocal("gui.done")));
+				height / 6 + 168, 200, 20, I18n.format("gui.done")));
 	}
 
 	/**
