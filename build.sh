@@ -5,8 +5,8 @@ LONGNAME=ThebombzenAPI
 LONGNAMELC=thebombzenapi
 SHORTNAME=API
 VERS=2.6.1
-MC_VERS=1.9.4
-MDK=1.9.4-12.17.0.1987
+MC_VERS=1.10.2
+MDK=1.10.2-12.18.2.2125
 ARCHIVE=$LONGNAME-v$VERS-mc$MC_VERS.jar
 
 CURRDIR="$PWD"
@@ -41,7 +41,7 @@ if [ ! -e gradlew ] ; then
 	cd build
 fi
 
-./gradlew build
+JAVA_OPTS="-Xmx2048m" ./gradlew build
 
 cp build/libs/modid-1.0.jar $ARCHIVE
 mkdir -p META-INF
