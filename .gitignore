@@ -1,6 +1,0 @@
-# Ignore anything built
-build
-
-# And also the jar file
-*.jar
-
