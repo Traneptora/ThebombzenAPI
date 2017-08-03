@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.installer;
+package com.thebombzen.mods.thebombzenapi.installer;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import thebombzen.mods.thebombzenapi.Constants;
+import com.thebombzen.mods.thebombzenapi.Constants;
 
 public class APIInstallerFrame extends JFrame {
 	

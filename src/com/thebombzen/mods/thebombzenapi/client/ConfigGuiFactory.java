@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.client;
+package com.thebombzen.mods.thebombzenapi.client;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi;
+package com.thebombzen.mods.thebombzenapi;
 
 /**
  * Stores constants that don't require the mod to be loaded or added to the classpath.

@@ -1,6 +1,7 @@
-package thebombzen.mods.thebombzenapi.client;
+package com.thebombzen.mods.thebombzenapi.client;
 
-import thebombzen.mods.thebombzenapi.ThebombzenAPI;
+import com.thebombzen.mods.thebombzenapi.ThebombzenAPI;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

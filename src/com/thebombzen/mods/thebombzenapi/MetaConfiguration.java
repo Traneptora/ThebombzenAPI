@@ -1,7 +1,7 @@
-package thebombzen.mods.thebombzenapi;
+package com.thebombzen.mods.thebombzenapi;
 
-import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
-import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
+import com.thebombzen.mods.thebombzenapi.configuration.ConfigOption;
+import com.thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 
 /**
  * This is the ThebombzenAPIConfiguration for ThebombzenAPI itself.

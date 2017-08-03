@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.configuration;
+package com.thebombzen.mods.thebombzenapi.configuration;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,11 +11,12 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.Properties;
 
+import com.thebombzen.mods.thebombzenapi.ThebombzenAPI;
+import com.thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
+
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thebombzen.mods.thebombzenapi.ThebombzenAPI;
-import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
 
 /**
  * This class represents a configuration for a mod.

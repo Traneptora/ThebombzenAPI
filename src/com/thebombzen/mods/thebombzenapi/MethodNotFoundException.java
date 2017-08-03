@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi;
+package com.thebombzen.mods.thebombzenapi;
 
 /**
  * An unchecked exception for ThebombzenAPI's own reflection classes.

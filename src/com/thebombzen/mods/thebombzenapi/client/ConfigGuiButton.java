@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.client;
+package com.thebombzen.mods.thebombzenapi.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.client;
+package com.thebombzen.mods.thebombzenapi.client;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -8,16 +8,17 @@ import java.util.Map;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import com.thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
+import com.thebombzen.mods.thebombzenapi.configuration.ConfigOption;
+import com.thebombzen.mods.thebombzenapi.configuration.SingleMultiBoolean;
+import com.thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thebombzen.mods.thebombzenapi.ThebombzenAPIBaseMod;
-import thebombzen.mods.thebombzenapi.configuration.ConfigOption;
-import thebombzen.mods.thebombzenapi.configuration.SingleMultiBoolean;
-import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 
 /**
  * This is a config screen for a mod, based on a configuration.

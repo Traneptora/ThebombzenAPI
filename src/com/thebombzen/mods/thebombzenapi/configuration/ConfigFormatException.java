@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.configuration;
+package com.thebombzen.mods.thebombzenapi.configuration;
 
 public class ConfigFormatException extends Exception {
 	private static final long serialVersionUID = 1L;

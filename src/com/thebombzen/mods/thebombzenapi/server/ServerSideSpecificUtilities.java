@@ -1,16 +1,17 @@
-package thebombzen.mods.thebombzenapi.server;
+package com.thebombzen.mods.thebombzenapi.server;
 
 import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
+
+import com.thebombzen.mods.thebombzenapi.SideSpecificUtlities;
+import com.thebombzen.mods.thebombzenapi.ThebombzenAPI;
 
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
-import thebombzen.mods.thebombzenapi.ThebombzenAPI;
 
 /**
  * This class provides server-side-specific functions.

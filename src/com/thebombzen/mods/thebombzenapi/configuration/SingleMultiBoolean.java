@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.configuration;
+package com.thebombzen.mods.thebombzenapi.configuration;
 
 public enum SingleMultiBoolean {
 	NEVER("Never"),

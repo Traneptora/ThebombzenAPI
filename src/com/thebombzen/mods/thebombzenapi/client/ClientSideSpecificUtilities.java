@@ -1,13 +1,14 @@
-package thebombzen.mods.thebombzenapi.client;
+package com.thebombzen.mods.thebombzenapi.client;
 
 import java.io.File;
+
+import com.thebombzen.mods.thebombzenapi.SideSpecificUtlities;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thebombzen.mods.thebombzenapi.SideSpecificUtlities;
 
 /**
  * This class provides client-side-specific functions.

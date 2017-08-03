@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.configuration;
+package com.thebombzen.mods.thebombzenapi.configuration;
 
 import org.lwjgl.input.Keyboard;
 

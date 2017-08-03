@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.client;
+package com.thebombzen.mods.thebombzenapi.client;
 
 import java.util.Collections;
 import java.util.Set;

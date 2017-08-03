@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi;
+package com.thebombzen.mods.thebombzenapi;
 
 import java.io.File;
 

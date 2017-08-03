@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi;
+package com.thebombzen.mods.thebombzenapi;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,7 +26,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thebombzen.mods.thebombzenapi.configuration.ThebombzenAPIConfiguration;
 
 /**
  * This class is the superclass of Thebombzen's mods. Extend this to get

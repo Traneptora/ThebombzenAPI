@@ -1,4 +1,4 @@
-package thebombzen.mods.thebombzenapi.configuration;
+package com.thebombzen.mods.thebombzenapi.configuration;
 
 public class CompoundExpression<U> implements BooleanTester<U> {
 	public static final int PURE = 0;
