@@ -238,12 +238,12 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 	 */
 	@SideOnly(Side.CLIENT)
 	public File getCorrectMemoryFile() {
-		if (Minecraft.getMinecraft().theWorld == null) {
+		if (Minecraft.getMinecraft().world == null) {
 			return null;
 		}
 		if (Minecraft.getMinecraft().isSingleplayer()) {
 			if (ThebombzenAPI.hasServerWorldLoaded()){
-				return new File(((SaveHandler) DimensionManager.getWorld(Minecraft.getMinecraft().thePlayer.dimension)
+				return new File(((SaveHandler) DimensionManager.getWorld(Minecraft.getMinecraft().player.dimension)
 						.getSaveHandler()).getWorldDirectory(),
 						getLongName().toUpperCase() + "_MEMORY.dat");
 			} else {
@@ -568,7 +568,7 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		toggles[index] = enabled;
 		if (keyPress) {
-			Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString(getToggleMessageString(index, enabled)));
+			Minecraft.getMinecraft().player.addChatMessage(new TextComponentString(getToggleMessageString(index, enabled)));
 		}
 
 	}

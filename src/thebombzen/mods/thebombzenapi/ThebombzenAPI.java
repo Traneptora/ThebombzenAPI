@@ -240,10 +240,10 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@SideOnly(Side.CLIENT)
 	public static boolean hasWorldChanged(){
-		if (Minecraft.getMinecraft().theWorld == null){
+		if (Minecraft.getMinecraft().world == null){
 			return false;
 		}
-		int currWorld = System.identityHashCode(Minecraft.getMinecraft().theWorld);
+		int currWorld = System.identityHashCode(Minecraft.getMinecraft().world);
 		return currWorld != prevWorld;
 	}
 	
@@ -258,10 +258,10 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		if (!Minecraft.getMinecraft().isSingleplayer()){
 			throw new UnsupportedOperationException("Only works for Singleplayer!");
 		}
-		if (Minecraft.getMinecraft().thePlayer == null){
+		if (Minecraft.getMinecraft().player == null){
 			return false;
 		}
-		WorldServer world = DimensionManager.getWorld(Minecraft.getMinecraft().thePlayer.dimension);
+		WorldServer world = DimensionManager.getWorld(Minecraft.getMinecraft().player.dimension);
 		return world != null;
 	}
 
@@ -454,7 +454,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	@SideOnly(Side.CLIENT)
 	public static boolean isWorldFirstLoadedWorld(){
-		if (Minecraft.getMinecraft().theWorld == null){
+		if (Minecraft.getMinecraft().world == null){
 			return false;
 		}
 		return prevWorld == 0;
@@ -647,13 +647,13 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		if (mc.theWorld == null) {
+		if (mc.world == null) {
 			return;
 		}
 		
 		if (tickEvent.phase.equals(Phase.END)) {
 			if (hasStart){
-				prevWorld = System.identityHashCode(mc.theWorld);
+				prevWorld = System.identityHashCode(mc.world);
 			}
 			hasStart = false;
 			return;

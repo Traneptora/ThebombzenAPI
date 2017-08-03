@@ -34,7 +34,7 @@ public class ClientSideSpecificUtilities implements SideSpecificUtlities {
 
 	@Override
 	public void addMessageToOwner(ITextComponent textComponent) {
-		Minecraft.getMinecraft().thePlayer.addChatMessage(textComponent);
+		Minecraft.getMinecraft().player.addChatMessage(textComponent);
 	}
 
 }
