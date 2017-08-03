@@ -1,5 +1,6 @@
 package thebombzen.mods.thebombzenapi.client;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ public class ThebombzenAPIConfigGuiFactory implements IModGuiFactory {
 		this.guiScreenClass = clazz;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public RuntimeOptionGuiHandler getHandlerFor(
 			RuntimeOptionCategoryElement element) {
@@ -37,6 +39,16 @@ public class ThebombzenAPIConfigGuiFactory implements IModGuiFactory {
 	@Override
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
 		return new HashSet<RuntimeOptionCategoryElement>();
+	}
+
+	@Override
+	public boolean hasConfigGui() {
+		return true;
+	}
+
+	@Override
+	public GuiScreen createConfigGui(GuiScreen parentScreen) {
+		return new ConfigScreen(parentScreen);
 	}
 
 }
