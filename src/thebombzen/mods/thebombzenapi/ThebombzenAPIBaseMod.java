@@ -568,9 +568,8 @@ public abstract class ThebombzenAPIBaseMod implements Comparable<ThebombzenAPIBa
 		}
 		toggles[index] = enabled;
 		if (keyPress) {
-			Minecraft.getMinecraft().player.addChatMessage(new TextComponentString(getToggleMessageString(index, enabled)));
+			ThebombzenAPI.sideSpecificUtilities.addMessageToOwner(new TextComponentString(getToggleMessageString(index, enabled)));
 		}
-
 	}
 
 	/**
