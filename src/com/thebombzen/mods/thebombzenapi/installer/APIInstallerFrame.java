@@ -247,7 +247,7 @@ public class APIInstallerFrame extends JFrame {
 		versionFolder.mkdir();
 		File file = new File(APIInstallerFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 		JarFile jarFile = new JarFile(file);
-		if (jarFile.getEntry("thebombzen/mods/thebombzenapi/installer/APIInstallerFrame.class") == null){
+		if (jarFile.getEntry("com/thebombzen/mods/thebombzenapi/installer/APIInstallerFrame.class") == null){
 			jarFile.close();
 			throw new Exception();
 		}
