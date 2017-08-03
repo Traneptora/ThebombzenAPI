@@ -718,7 +718,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	@Override
 	protected String getVersionFileURLString() {
-		return "https://thebombzen.com/ThebombzenAPI/repo/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
+		return "https://thebombzen.com/ThebombzenAPI/release/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
 	}
 
 	/**
