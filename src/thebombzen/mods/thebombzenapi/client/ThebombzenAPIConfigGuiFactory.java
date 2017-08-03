@@ -38,7 +38,7 @@ public class ThebombzenAPIConfigGuiFactory implements IModGuiFactory {
 
 	@Override
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
-		return new HashSet<RuntimeOptionCategoryElement>();
+		return Collections.emptySet();
 	}
 
 	@Override
