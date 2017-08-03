@@ -50,7 +50,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "thebombzen.mods.thebombzenapi.client.ConfigGuiFactory", acceptedMinecraftVersions = "[1.9.4, 1.11.2]")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "com.thebombzen.mods.thebombzenapi.client.ConfigGuiFactory", acceptedMinecraftVersions = "[1.9.4, 1.11.2]")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
@@ -69,7 +69,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	/**
 	 * Various side-dependent routines
 	 */
-	@SidedProxy(clientSide = "thebombzen.mods.thebombzenapi.client.ClientSideSpecificUtilities", serverSide = "thebombzen.mods.thebombzenapi.server.ServerSideSpecificUtilities")
+	@SidedProxy(clientSide = "com.thebombzen.mods.thebombzenapi.client.ClientSideSpecificUtilities", serverSide = "com.thebombzen.mods.thebombzenapi.server.ServerSideSpecificUtilities")
 	public static SideSpecificUtlities sideSpecificUtilities;
 
 	/**
