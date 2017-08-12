@@ -716,9 +716,17 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		throw new UnsupportedOperationException("ThebombzenAPI has no toggles!");
 	}
 	
+	/**
+	 * Returns true if mods should check all minecraft versions for updates
+	 * Returns false if mods should only check within minecraft version for updates
+	 */
+	public static boolean getCheckAllMinecraftVersions() {
+		return ThebombzenAPI.instance.getConfiguration().getBooleanProperty(MetaConfiguration.CHECK_ALL_MINECRAFT_VERSIONS);
+	}
+	
 	@Override
 	protected String getVersionFileURLString() {
-		return "https://thebombzen.com/ThebombzenAPI/release/TBZAPIVersion-" + Constants.MC_VERSION +".txt";
+		return "https://thebombzen.com/" + this.getLongName() + "/release/" + this.getShortName() + "Version" + ( getCheckAllMinecraftVersions() ? "" : "-" + Constants.MC_VERSION ) + ".txt";
 	}
 
 	/**

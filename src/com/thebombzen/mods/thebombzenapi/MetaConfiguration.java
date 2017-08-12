@@ -18,6 +18,17 @@ public class MetaConfiguration extends ThebombzenAPIConfiguration {
 			"to see new updates.");
 	
 	/**
+	 * Check across minecraft versions when checking for updates.
+	 * Note: **It is the responsibility of the modder to honor this.**
+	 * getVersionFileURLString is abstracted intentionally, and it is your responsibility to honor this option.
+	 * To make this easy, use ThebombzenAPI.getCheckAllMinecraftVersions()
+	 */
+	public static ConfigOption CHECK_ALL_MINECRAFT_VERSIONS = new ConfigOption(true, "CHECK_ALL_MINECRAFT_VERSIONS", "Check All Minecraft Versions",
+			"Check for updates across all minecraft versions",
+			"Disable to only see only updates",
+			"from the current Minecraft version.");
+	
+	/**
 	 * Construct an empty configuration.
 	 */
 	public MetaConfiguration() {
@@ -26,7 +37,7 @@ public class MetaConfiguration extends ThebombzenAPIConfiguration {
 
 	@Override
 	public ConfigOption[] getAllOptions() {
-		return new ConfigOption[]{UPDATE_REMINDERS};
+		return new ConfigOption[]{UPDATE_REMINDERS, CHECK_ALL_MINECRAFT_VERSIONS};
 	}
 	
 }
