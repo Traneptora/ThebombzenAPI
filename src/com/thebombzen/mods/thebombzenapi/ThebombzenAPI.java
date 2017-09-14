@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -539,6 +540,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	 */
 	public static void registerMod(ThebombzenAPIBaseMod mod) {
 		mods.add(mod);
+		toggleKeyDownLastTick.put(mod, false);
 	}
 	
 	
@@ -729,6 +731,8 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 		return "https://thebombzen.com/" + this.getLongName() + "/release/" + this.getShortName() + "Version" + ( getCheckAllMinecraftVersions() ? "" : "-" + Constants.MC_VERSION ) + ".txt";
 	}
 
+	private static Map<ThebombzenAPIBaseMod, Boolean> toggleKeyDownLastTick = new HashMap<>();
+
 	/**
 	 * Enable or disable the toggle keys associated with each mod, according to whether or not they have been pressed.
 	 */
@@ -737,11 +741,13 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 			int num = mod.getNumToggleKeys();
 			for (int i = 0; i < num; i++){
 				int toggleKeyCode = mod.getToggleKeyCode(i);
-				if (ThebombzenAPI.isExtendedKeyDown(toggleKeyCode) && (toggleKeyCode < 0 && Mouse.getEventButton() != -1 || toggleKeyCode >= 0 && !Keyboard.isRepeatEvent())){
+				boolean keyDown = ThebombzenAPI.isExtendedKeyDown(toggleKeyCode);
+				if (keyDown && !toggleKeyDownLastTick.get(mod)){
 					boolean enabled = mod.isToggleEnabled(i);
 					mod.setToggleEnabled(i, !enabled, true);
 					mod.writeToCorrectMemoryFile();
 				}
+				toggleKeyDownLastTick.put(mod, keyDown);
 			}
 		}
 	}
