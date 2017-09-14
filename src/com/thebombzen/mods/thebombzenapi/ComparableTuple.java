@@ -56,6 +56,7 @@ public class ComparableTuple<T extends Comparable<T>> implements Comparable<Comp
 	 * Construct a ComparableTuple from several elements.
 	 * @param elements The elements comprising this tuple.
 	 */
+	@SafeVarargs
 	public ComparableTuple(T... elements){
 		this.elements.addAll(Arrays.asList(elements));
 	}
