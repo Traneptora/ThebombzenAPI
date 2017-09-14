@@ -144,7 +144,7 @@ public abstract class ThebombzenAPIConfigScreen extends GuiScreen {
 		this.drawDefaultBackground();
 		// field_146289_q == fontRenderer
 		// field_146294_l == width
-		this.drawCenteredString(fontRendererObj, title, width / 2, 10,
+		this.drawCenteredString(fontRenderer, title, width / 2, 10,
 				16777215);
 		super.drawScreen(i, j, f);
 		// field_146297_k == mc

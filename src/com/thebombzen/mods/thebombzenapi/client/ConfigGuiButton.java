@@ -90,14 +90,14 @@ public class ConfigGuiButton extends GuiButton {
 
 		// field_146120_f == width
 		// field_146121_g == height
-		// field_146128_h == xPosition
-		// field_146129_i == yPosition
+		// field_146128_h == xPosition == x
+		// field_146129_i == yPosition == x
 
-		if (i >= xPosition && j >= yPosition
-				&& i < (xPosition + width)
-				&& j < (yPosition + height)) {
+		if (i >= this.x && j >= y
+				&& i < (x + width)
+				&& j < (y + height)) {
 
-			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
 
 			int lineHeight = fontRenderer.FONT_HEIGHT + 3;
 
