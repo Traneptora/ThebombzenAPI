@@ -21,21 +21,9 @@ public class ThebombzenAPIConfigGuiFactory implements IModGuiFactory {
 		this.guiScreenClass = clazz;
 	}
 	
-	@SuppressWarnings("deprecation")
-	@Override
-	public RuntimeOptionGuiHandler getHandlerFor(
-			RuntimeOptionCategoryElement element) {
-		return null;
-	}
-
 	@Override
 	public void initialize(Minecraft minecraftInstance) {
 		
-	}
-
-	@Override
-	public Class<? extends GuiScreen> mainConfigGuiClass() {
-		return guiScreenClass;
 	}
 
 	@Override
