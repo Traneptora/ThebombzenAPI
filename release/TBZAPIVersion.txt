@@ -1,1 +1,2 @@
-TBZAPIVersion-1.11.txt
+ThebombzenAPI, version 2.9.0, Minecraft 1.9.4-1.12.1
+
