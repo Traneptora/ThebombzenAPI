@@ -2,19 +2,22 @@ package com.thebombzen.mods.thebombzenapi.installer;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.jar.JarFile;
+import java.util.zip.ZipError;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -31,66 +34,45 @@ import com.thebombzen.mods.thebombzenapi.Constants;
 public class APIInstallerFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
-	
+
 	public static void copyFile(File sourceFile, File destFile) throws IOException {
-		
-	    if(!destFile.exists()) {
-	        destFile.createNewFile();
-	    }
-
-	    FileChannel source = null;
-	    FileChannel destination = null;
-	    FileInputStream inStream = null;
-	    FileOutputStream outStream = null;
-	    
-	    try {
-	    	inStream = new FileInputStream(sourceFile);
-	    	outStream = new FileOutputStream(destFile);
-	        source = inStream.getChannel();
-	        destination = outStream.getChannel();
-
-	        long count = 0;
-	        long size = source.size();              
-	        while((count += destination.transferFrom(source, count, size-count)) < size);
-	    } finally {
-	    	if (inStream != null){
-	    		inStream.close();
-	    	}
-	    	if (outStream != null){
-	    		outStream.close();
-	    	}
-	        if(source != null) {
-	            source.close();
-	        }
-	        if(destination != null) {
-	            destination.close();
-	        }
-	    }
+		Files.copy(sourceFile.toPath(), destFile.toPath());
 	}
-	public static String getMinecraftClientDirectory() throws IOException {
+
+	public static String getMinecraftClientDirectory() {
 		String name = System.getProperty("os.name");
 		if (name.toLowerCase().contains("windows")){
-			return new File(System.getenv("appdata") + "\\.minecraft").getCanonicalPath();
+			return new File(System.getenv("appdata") + "\\.minecraft").getAbsolutePath();
 		} else if (name.toLowerCase().contains("mac") || name.toLowerCase().contains("osx") || name.toLowerCase().contains("os x")){
-			return new File(System.getProperty("user.home") + "/Library/Application Support/minecraft").getCanonicalPath();
+			return new File(System.getProperty("user.home") + "/Library/Application Support/minecraft").getAbsolutePath();
 		} else {
-			return new File(System.getProperty("user.home") + "/.minecraft").getCanonicalPath();
+			return new File(System.getProperty("user.home") + "/.minecraft").getAbsolutePath();
 		}
 	}
+
 	public static void main(String[] args) throws IOException {
-		new APIInstallerFrame().setVisible(true);
+		if (args.length > 0 && ("-n".equals(args[0]) || "--no-gui".equals(args[0]))) {
+			installNoGui(getMinecraftClientDirectory());
+		} else {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					new APIInstallerFrame().setVisible(true);
+				}
+			});
+		}
 	}
+
 	private JTextField textField;
 	private JRadioButton installClient;
 	private JRadioButton installServer;
-	
+
 	private JButton install;
-	
+
 	private String clientDirectory = getMinecraftClientDirectory();
-	
+
 	private String serverDirectory = "";
-	
-	public APIInstallerFrame() throws IOException {
+
+	public APIInstallerFrame() {
 		final APIInstallerFrame frame = this;
 		Box superBox = Box.createHorizontalBox();
 		superBox.add(Box.createHorizontalStrut(10));
@@ -216,17 +198,17 @@ public class APIInstallerFrame extends JFrame {
 		
 		this.setLocation((size.width - getWidth()) / 2, (size.height - getHeight()) / 2);
 	}
-	
+
 	private void clickedInstallClient(){
 		serverDirectory = textField.getText();
 		textField.setText(clientDirectory);
 	}
-	
+
 	private void clickedInstallServer(){
 		clientDirectory = textField.getText();
 		textField.setText(serverDirectory);
 	}
-	
+
 	private void install(){
 		try {
 			install(textField.getText());
@@ -235,38 +217,51 @@ public class APIInstallerFrame extends JFrame {
 		}
 	}
 
-	private void install(String directory) throws Exception {
-		File dir = new File(directory);
-		if (!dir.isDirectory()){
-			JOptionPane.showMessageDialog(this, "Something's wrong with the given folder. Check spelling and try again.", "Hmmm...", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+	private static void installNoGui(String directory, String mcVersion) throws IOException {
 		File modsFolder = new File(directory, "mods");
-		modsFolder.mkdir();
-		File versionFolder = new File(modsFolder, Constants.MC_VERSION);
-		versionFolder.mkdir();
-		File file = new File(APIInstallerFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+		modsFolder.mkdirs();
+		File versionFolder = new File(modsFolder, mcVersion);
+		versionFolder.mkdirs();
+		File file = null;
+		try {
+			file = new File(APIInstallerFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+		} catch (URISyntaxException uri) {
+			throw new Error();
+		}
 		JarFile jarFile = new JarFile(file);
 		if (jarFile.getEntry("com/thebombzen/mods/thebombzenapi/installer/APIInstallerFrame.class") == null){
 			jarFile.close();
-			throw new Exception();
+			throw new ZipError("Could not find self!");
 		}
 		jarFile.close();
-		File[] mods = modsFolder.listFiles();
-		File[] modsVersion = versionFolder.listFiles();
-		for (File testMod : mods){
-			if (testMod.getName().matches("^ThebombzenAPI-v\\d\\.\\d(\\.\\d)?-mc\\d\\.\\d(\\.\\d)?\\.(jar|zip)$")){
-				testMod.delete();
-			}
-		}
-		for (File testMod : modsVersion){
-			if (testMod.getName().matches("^ThebombzenAPI-v\\d\\.\\d(\\.\\d)?-mc\\d\\.\\d(\\.\\d)?\\.(jar|zip)$")){
+		List<File> testFiles = new ArrayList<File>();
+		testFiles.addAll(Arrays.asList(modsFolder.listFiles()));
+		testFiles.addAll(Arrays.asList(versionFolder.listFiles()));
+		for (File testMod : testFiles) {
+			if (testMod
+					.getName()
+					.matches(
+							"^ThebombzenAPI-v\\d+\\.\\d+(\\.\\d+)?-mc\\d+\\.\\d+(\\.\\d+)?\\.(jar|zip)$")) {
 				testMod.delete();
 			}
 		}
 		copyFile(file, new File(versionFolder, file.getName()));
+	}
+
+	private static void installNoGui(String directory) throws IOException {
+		for (String mcVersion : Constants.INSTALL_MC_VERSIONS){
+			installNoGui(directory, mcVersion);
+		}
+	}
+
+	private void install(String directory) throws IOException {
+		if (!new File(directory).isDirectory()){
+			JOptionPane.showMessageDialog(this, "Something's wrong with the given folder. Check spelling and try again.", "Hmmm...", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		installNoGui(directory);
 		JOptionPane.showMessageDialog(this, "Successfully installed ThebombzenAPI!", "Success!", JOptionPane.INFORMATION_MESSAGE);
 		System.exit(0);
 	}
-	
+
 }

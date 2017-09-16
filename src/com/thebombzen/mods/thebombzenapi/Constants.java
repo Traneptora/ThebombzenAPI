@@ -13,5 +13,10 @@ public interface Constants {
 	/**
 	 * The version of Minecraft this was built for.
 	 */
-	public static final String MC_VERSION = "1.12.1";
+	public static final String MC_VERSION = "1.9.4 to 1.12.1";
+
+	/**
+	 * The versions of Minecraft this should be installed in.
+	 */
+	public static final String[] INSTALL_MC_VERSIONS = {"1.12.1", "1.11.2", "1.10.2", "1.9.4"};
 }
