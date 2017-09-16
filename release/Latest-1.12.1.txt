@@ -1,3 +1,1 @@
-ThebombzenAPI-v2.9.0-mc1.12.1.jar
-https://thebombzen.com/ThebombzenAPI/release/ThebombzenAPI-v2.9.0-mc1.12.1.jar
-
+Latest.txt
