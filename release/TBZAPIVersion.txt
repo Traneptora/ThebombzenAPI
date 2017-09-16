@@ -1,2 +1,2 @@
-ThebombzenAPI, version 2.9.0, Minecraft 1.9.4-1.12.1
+ThebombzenAPI, version 2.9.0, Minecraft 1.9.4 to 1.12.1
 
