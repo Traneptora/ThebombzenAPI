@@ -700,7 +700,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getLongVersionString() {
-		return "ThebombzenAPI, version " + Constants.VERSION + ", Minecraft " + Constants.MC_VERSION;
+		return "ThebombzenAPI, version " + Constants.VERSION + ", Minecraft " + Constants.SUPPORTED_MC_VERSIONS;
 	}
 
 	@Override
@@ -728,7 +728,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 	
 	@Override
 	protected String getVersionFileURLString() {
-		return "https://thebombzen.com/" + this.getLongName() + "/release/" + this.getShortName() + "Version" + ( getCheckAllMinecraftVersions() ? "" : "-" + Constants.MC_VERSION ) + ".txt";
+		return "https://thebombzen.com/" + this.getLongName() + "/release/" + this.getShortName() + "Version" + ( getCheckAllMinecraftVersions() ? "" : "-" + MinecraftForge.MC_VERSION ) + ".txt";
 	}
 
 	private static Map<ThebombzenAPIBaseMod, Boolean> toggleKeyDownLastTick = new HashMap<>();
