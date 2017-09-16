@@ -690,7 +690,7 @@ public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	@Override
 	public String getDownloadLocationURLString() {
-		return "http://is.gd/ThebombzensMods#ThebombzenAPI";
+		return "https://thebombzen.com/ThebombzenAPI/thread/";
 	}
 
 	@Override
