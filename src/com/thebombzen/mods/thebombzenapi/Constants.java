@@ -10,7 +10,7 @@ public interface Constants {
 	/**
 	 * The current version of ThebombzenAPI.
 	 */
-	public static final String VERSION = "2.9.2";
+	public static final String VERSION = "2.9.3";
 
 	/**
 	 * The human-readable version of Minecraft this was built for.
