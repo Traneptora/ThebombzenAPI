@@ -21,22 +21,26 @@ public class ThebombzenAPIConfigGuiFactory implements IModGuiFactory {
 		this.guiScreenClass = clazz;
 	}
 	
-	@Override
 	public void initialize(Minecraft minecraftInstance) {
 		
 	}
 
-	@Override
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
 		return Collections.emptySet();
 	}
 
-	@Override
 	public boolean hasConfigGui() {
 		return true;
 	}
 
-	@Override
+	public Class<? extends GuiScreen> mainConfigGuiClass() {
+		return guiScreenClass;
+	}
+
+	public <T> T getHandlerFor(RuntimeOptionCategoryElement element) {
+		return null;
+	}
+
 	public GuiScreen createConfigGui(GuiScreen parentScreen) {
 		try {
 			return guiScreenClass.getConstructor(GuiScreen.class).newInstance(parentScreen);
