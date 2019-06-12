@@ -10,16 +10,16 @@ public interface Constants {
 	/**
 	 * The current version of ThebombzenAPI.
 	 */
-	public static final String VERSION = "2.9.3";
+	public static final String VERSION = "2.10.0";
 
 	/**
 	 * The human-readable version of Minecraft this was built for.
 	 */
-	public static final String SUPPORTED_MC_VERSIONS = "1.9.4 to 1.12.2";
+	public static final String SUPPORTED_MC_VERSIONS = "1.9.4 to 1.14.2";
 
 	/**
 	 * The versions of Minecraft this should be installed in.
 	 */
-	public static final String[] INSTALL_MC_VERSIONS = {"1.12.2", "1.12.1", "1.11.2", "1.10.2", "1.9.4"};
+	public static final String[] INSTALL_MC_VERSIONS = {"1.14.2", "1.12.2", "1.12.1", "1.11.2", "1.10.2", "1.9.4"};
 
 }

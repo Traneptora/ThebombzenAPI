@@ -4,9 +4,9 @@ set -e
 LONGNAME="ThebombzenAPI"
 LONGNAMELC="thebombzenapi"
 SHORTNAME="API"
-VERS="2.9.3"
-MC_VERS="1.12.2"
-MDK="1.12.2-14.23.0.2493"
+VERS="2.10.0"
+MC_VERS="1.14.2"
+MDK="1.14.2-26.0.16"
 ARCHIVE="${LONGNAME}-v${VERS}-mc${MC_VERS}.jar"
 
 CURRDIR="$PWD"

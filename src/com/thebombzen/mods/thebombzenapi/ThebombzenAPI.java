@@ -51,7 +51,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * 
  * @author thebombzen
  */
-@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "com.thebombzen.mods.thebombzenapi.client.ConfigGuiFactory", acceptedMinecraftVersions = "[1.9.4, 1.12.2]")
+@Mod(modid = "thebombzenapi", name = "ThebombzenAPI", version = Constants.VERSION, guiFactory = "com.thebombzen.mods.thebombzenapi.client.ConfigGuiFactory", acceptedMinecraftVersions = "[1.9.4, 1.14.2]")
 public class ThebombzenAPI extends ThebombzenAPIBaseMod {
 
 	/**
